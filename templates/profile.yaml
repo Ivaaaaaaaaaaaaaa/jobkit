@@ -1,0 +1,104 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# ПРОФИЛЬ — единственный файл с настройками. Код фреймворка не трогаем, меняем это.
+# Заполняет /onboard вопросами; руками править можно в любой момент.
+# Файл лежит в me/ — эта папка закрыта .gitignore и никуда не уезжает.
+# Пусто или TODO — значит «ещё не решили»; агент спросит, когда понадобится.
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: "TODO"                    # как в паспорте/LinkedIn, латиницей
+chat_language: "ru"             # на каком языке агент говорит с тобой
+docs_language: "en"             # язык CV и писем по умолчанию (en | ru | ...)
+
+contacts:
+  email: "TODO"                 # отдельный ящик под поиск работы — лучше завести новый
+  phone: "TODO"                 # в международном формате: +7 999 123-45-67
+  city: "TODO"                  # где живёшь сейчас: город, страна
+  linkedin: "TODO"
+  portfolio: ""                 # Notion / сайт / Behance — если есть
+  telegram: ""
+  github: ""
+
+# ── Цель ─────────────────────────────────────────────────────────────────────
+target:
+  roles: ["TODO"]               # что ищем человеческими словами: "Product Manager", "Growth PM"
+  seniority: "TODO"             # junior | middle | senior | lead — честно, по опыту
+  stretch_up: true              # подаваться на ступень выше, если JD это допускает
+  domains_like: []              # где хочется: fintech, edtech, b2b saas, games ...
+  domains_avoid: []             # куда точно нет
+  company_stage: []             # startup | scaleup | enterprise | agency — пусто = любые
+  employment: ["full-time"]     # full-time | contract | part-time
+
+# ── Поиск (читают scripts/scan.py и агент) ──────────────────────────────────
+search:
+  sources: ["ats", "jobicy", "remoteok", "remotive"]   # см. scripts/scan.py
+  board_tags: ["product"]       # теги для открытых досок (jobicy/remoteok/remotive)
+  title_include:                # роль проходит, если в названии есть хоть одно
+    - "product manager"
+    - "product owner"
+  title_exclude:                # и нет ни одного из этих
+    - "intern"
+    - "engineer"
+    - "designer"
+    - "marketing manager"
+  max_age_days: 14              # свежесть: старше — не берём
+  per_run: 10                   # сколько подач за один заход /jobs-run
+
+# ── Гео ─────────────────────────────────────────────────────────────────────
+geo:
+  formats: ["remote"]           # remote | hybrid | office
+  office_cities: []             # где готов в офис/гибрид
+  relocation: "no"              # no | open | yes — открыт ли к переезду
+  relocation_countries: []      # куда — если open/yes
+  ok_keywords:                  # локация вакансии с этими словами — подходит
+    - "remote"
+    - "europe"
+    - "emea"
+    - "worldwide"
+    - "anywhere"
+  block_keywords:               # с этими — мимо (если рядом нет сильного ok-слова вроде "europe")
+    - "us"
+    - "usa"
+    - "united states"
+    - "us only"
+    - "canada"
+    - "india"
+    - "new york"
+    - "san francisco"
+    - "seattle"
+    - "austin"
+    - "toronto"
+    - "brazil"
+    - "latam"
+    - "apac"
+    - "singapore"
+
+# ── Право на работу (ответы зависят от страны вакансии, см. application-answers) ──
+work_authorization:
+  citizenship: "TODO"
+  can_work_in: ["TODO"]         # страны, где можешь работать без визы/спонсорства
+  needs_sponsorship_elsewhere: true
+  contractor_ok: true           # готов ли работать по B2B/контракту (ИП, своя компания)
+
+# ── Деньги (подробно и со ступенями — me/application-answers.md §Деньги) ──
+salary:
+  currency: "EUR"
+  floor_year: 0                 # нижняя граница: вилка вакансии ниже — не подаёмся. 0 = без порога
+  target_year: 0                # желаемое; агент сам строит ступени под тип вакансии
+
+# ── Автономность: что агент делает сам ──────────────────────────────────────
+autonomy:
+  # confirm_each — агент доводит форму до кнопки Submit, жмёшь ты (по умолчанию, безопасно);
+  # auto_high    — роли с высоким баллом агент отправляет сам, остальные ждут тебя;
+  # draft_only   — агент только готовит CV, письмо и ответы, форму не трогает.
+  submit_mode: "confirm_each"
+  auto_high_min_score: 8        # порог «высокого балла» для auto_high (1–10)
+  send_messages: false          # писать рекрутёрам от твоего имени — только черновики, если false
+
+# ── Исключения ──────────────────────────────────────────────────────────────
+skip_companies: []              # куда не подаёмся: бывшие работодатели, «насыщенные», неприятные
+banned_claims: []               # слова и навыки, которых у тебя НЕТ и которые нельзя писать
+                                # ни в CV, ни в письмах (например "SQL", "team lead", "B2B")
+
+# ── Где хранить трекер ──────────────────────────────────────────────────────
+tracker:
+  backend: "csv"                # csv (data/tracker.csv) | notion | sheets — см. playbooks/data-storage.md

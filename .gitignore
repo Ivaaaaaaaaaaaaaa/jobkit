@@ -1,0 +1,8 @@
+# Личное и рабочее — никогда не в git
+me/
+data/
+.env
+.venv/
+__pycache__/
+*.pyc
+.DS_Store

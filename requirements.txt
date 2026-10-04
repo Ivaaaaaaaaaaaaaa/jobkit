@@ -1,0 +1,3 @@
+pyyaml          # профиль и данные CV
+python-docx     # сборка резюме в DOCX
+# PDF: LibreOffice (brew install --cask libreoffice) или пакет docx2pdf при установленном Word

@@ -1,0 +1,50 @@
+# Данные резюме. Из них scripts/render_cv.py рисует DOCX/PDF.
+# Здесь ВСЁ: все роли, все буллеты (даже лишние), все навыки. Под вакансию отбираем
+# overlay-файлом (data/applications/<id>/cv.yaml), сюда не лезем.
+# Факты — только из me/experience-bank.md.
+
+header:
+  name: "TODO Name Surname"
+  location: "TODO City, Country"
+  phone: "TODO +0 000 000 0000"
+  email: "TODO name@example.com"
+  links:                                   # имя ссылки: адрес
+    LinkedIn: "https://www.linkedin.com/in/TODO"
+    # Portfolio: "https://..."
+
+title: "TODO Product Manager"              # строка под именем по умолчанию
+page: "A4"                                 # A4 — Европа и почти весь мир; Letter — США
+
+summary: >
+  TODO 3–4 предложения о своём опыте (не обращаясь к работодателю): кто ты, лучший результат
+  с цифрой, что умеешь лучше других, в каких продуктах.
+
+experience:
+  - company: "TODO Company"
+    descriptor: "TODO что за компания, одной строкой"
+    location: "TODO City / Remote"
+    role: "TODO Product Manager"
+    title_options: []                      # честные альтернативные тайтлы этой же роли
+    dates: "TODO Mon YYYY – Present"
+    bullets:                               # результат с цифрой → как → чем; ≤ 2 строк
+      - "TODO Increased X by N% (vs baseline) by doing Y, using Z"
+      - "TODO"
+      - "TODO"
+
+projects: []                               # - name: "..."  text: "..."  url: "..."
+
+skills:                                    # 3–5 групп, навык только в одной группе
+  - group: "Product"
+    items: ["TODO"]
+  - group: "Data & Analytics"
+    items: ["TODO"]
+  - group: "Tools"
+    items: ["TODO"]
+
+education:
+  - school: "TODO University"
+    degree: "TODO BSc, Field"
+    dates: "TODO YYYY–YYYY"
+
+languages: "TODO Languages: English (C1), Russian (native)"
+work_authorization: ""                     # напр. "Eligible to work in the EU" — только если правда
