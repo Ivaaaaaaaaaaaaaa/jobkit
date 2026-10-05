@@ -18,7 +18,7 @@
 1. Создай папку под поиск и открой её в Claude Code (например, `~/job-search`).
 2. Поставь плагин:
    ```
-   /plugin marketplace add <github-владелец>/jobkit
+   /plugin marketplace add Ivaaaaaaaaaaaaaa/jobkit
    /plugin install jobkit@jobkit
    ```
    (Из архива: `/plugin marketplace add ~/Downloads/jobkit`.)

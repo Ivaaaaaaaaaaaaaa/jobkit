@@ -9,7 +9,7 @@ What is sent (and nothing else):
 Identity: a random install id (data/telemetry.json). No name, email or IP-derived location
 is attached by the kit. Opt out: `jk telemetry off` or profile.yaml -> telemetry: false.
 
-Transport: PostHog capture API (config/telemetry.json). Its project key is public by design —
+Transport: PostHog batch API (config/telemetry.json, US cloud). Its project key is public by design —
 it can only write events, not read them. Empty key = events wait in data/telemetry-outbox.jsonl
 and go out after an update brings a key. Network errors never break the user's work.
 """

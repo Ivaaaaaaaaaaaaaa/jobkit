@@ -10,3 +10,7 @@ Users get the agent rules from `skills/jobkit/SKILL.md`; this file is for workin
 - Before a release: `python3 scripts/jk.py test` green; bump `VERSION`, `.claude-plugin/plugin.json`,
   `.claude-plugin/marketplace.json` together (CI checks); add a CHANGELOG entry.
 - Never commit real personal data. Fixtures are fictional.
+- Source of truth lives in the maintainer's vault (`Career/job-search-kit/`); the public repo is
+  published from it with `git subtree split --prefix=Career/job-search-kit -b jobkit-release`
+  and a push of that branch to `main` of github.com/Ivaaaaaaaaaaaaaa/jobkit. Tag releases with
+  `claude plugin tag`.
