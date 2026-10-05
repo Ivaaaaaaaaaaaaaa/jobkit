@@ -1,25 +1,15 @@
 #!/usr/bin/env python3
-"""Трекер откликов: один CSV-файл — единственный источник правды о каждой вакансии.
+"""Application tracker: one CSV (data/tracker.csv) is the source of truth for every vacancy.
 
-Зачем CSV, а не база: открывается в Excel/Numbers/Google Sheets, не требует ключей,
-переносится копированием папки. Если захочешь Notion или Google Sheets — см.
-playbooks/data-storage.md: колонки те же, меняется только место хранения.
+    jk t add --company X --role Y --url URL [--source S] [--location L] [--posted-days N]
+             [--score N] [--track T] [--status found] [--comment "..."]
+    jk t check "Company::Role" URL ["Company2::Role2" URL2 ...]   # dedup; exit 1 on duplicate
+    jk t set <id|url> <status> ["comment"] [--next "what" --date YYYY-MM-DD]
+    jk t list [--status applied] [--company X]
+    jk t funnel | due | --selftest
 
-Команды:
-    python scripts/tracker.py add  --company X --role Y --url URL [--source S] [--location L]
-                                   [--posted-days N] [--score N] [--track T] [--status found]
-                                   [--comment "..."]
-    python scripts/tracker.py check "Компания::Роль" URL ["Компания2::Роль2" URL2 ...]
-    python scripts/tracker.py set  <id|url> <статус> ["комментарий"] [--next "что" --date YYYY-MM-DD]
-    python scripts/tracker.py list [--status applied] [--company X]
-    python scripts/tracker.py funnel
-    python scripts/tracker.py due            # что пора сделать сегодня (follow-up, тестовые)
-    python scripts/tracker.py --selftest
-
-Дедуп (`check`) печатает:
-    ⛔  та же роль у той же компании или та же ссылка  -> не подаваться (exit 1)
-    ⚠   та же компания, другая роль                    -> прочитать список глазами
-    ✅  нового нет в трекере
+check prints: ⛔ same role at the same company or same link (don't apply) · ⚠ same company,
+different role (read the list) · ✅ new. CSV opens in Excel/Numbers/Sheets.
 """
 from __future__ import annotations
 
@@ -31,14 +21,16 @@ from datetime import date, datetime
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
-ROOT = Path(__file__).resolve().parent.parent
-TRACKER = ROOT / "data" / "tracker.csv"
+sys.path.insert(0, str(Path(__file__).parent))
+from paths import DATA  # noqa: E402
+from events import log  # noqa: E402
+TRACKER = DATA / "tracker.csv"
 
 COLUMNS = ["id", "company", "role", "url", "source", "location", "found_at", "posted_days",
            "score", "track", "status", "applied_at", "next_action", "next_date", "cv_path",
            "comment", "updated_at"]
 
-# Статус движется вперёд; rejected / withdrawn / skipped — конечные.
+# Status moves forward; rejected / withdrawn / skipped are final.
 STATUSES = ["found", "ready", "applied", "screening", "interview", "test", "final", "offer",
             "rejected", "withdrawn", "skipped"]
 ACTIVE = {"applied", "screening", "interview", "test", "final"}
@@ -48,22 +40,22 @@ LEGAL = r"\b(inc|ltd|llc|gmbh|bv|ag|sa|sas|plc|limited|corp|corporation|co|group
 
 def norm_company(s: str) -> str:
     s = re.sub(LEGAL, " ", (s or "").lower())
-    return re.sub(r"[^a-z0-9а-яё]+", "", s)          # «Fundraise Up» == «FundraiseUp»
+    return re.sub(r"[^a-z0-9а-яё]+", "", s)          # "Fundraise Up" == "FundraiseUp"
 
 
 def norm_role(s: str) -> str:
-    s = re.sub(r"\(.*?\)", " ", (s or "").lower())    # «PM (AI)» == «PM»
+    s = re.sub(r"\(.*?\)", " ", (s or "").lower())    # "PM (AI)" == "PM"
     s = re.sub(r"\b(sr|snr)\b", "senior", s)
     return re.sub(r"[^a-z0-9а-яё]+", " ", s).strip()
 
 
 def norm_url(u: str) -> str:
-    """Одна вакансия в разных написаниях ссылки -> один ключ."""
+    """One vacancy under different URL spellings -> one key."""
     if not u:
         return ""
     p = urlparse(u.strip())
     q = parse_qs(p.query)
-    for key in ("gh_jid", "jobId", "job_id", "jk", "currentJobId"):   # id вакансии в query
+    for key in ("gh_jid", "jobId", "job_id", "jk", "currentJobId"):   # job id in the query
         if key in q:
             return f"{key}={q[key][0]}"
     path = re.sub(r"/(apply|application|applications?/new)/?$", "", p.path.rstrip("/"))
@@ -116,7 +108,7 @@ def cmd_add(a) -> int:
     rows = load()
     verdict, hits = check(rows, a.company, a.role, a.url)
     if verdict == "dup":
-        print(f"⛔ уже в трекере: {hits[0]['id']} [{hits[0]['status']}]")
+        print(f"⛔ already tracked: {hits[0]['id']} [{hits[0]['status']}]")
         return 1
     today = date.today().isoformat()
     base, n, rid = slug(a.company, a.role), 2, slug(a.company, a.role)
@@ -127,8 +119,9 @@ def cmd_add(a) -> int:
                  "posted_days": a.posted_days or "", "score": a.score or "", "track": a.track or "",
                  "status": a.status, "comment": a.comment or "", "updated_at": today})
     save(rows)
-    note = "  (⚠ компания уже есть с другой ролью)" if verdict == "company" else ""
-    print(f"✅ добавлено: {rid}{note}")
+    log("lead_added", id=rid, source=(a.source or "").split(":")[0], score=a.score, track=a.track, status=a.status)
+    note = "  (⚠ company already tracked with another role)" if verdict == "company" else ""
+    print(f"✅ added: {rid}{note}")
     return 0
 
 
@@ -141,29 +134,31 @@ def cmd_check(a) -> int:
         i += 2 if url else 1
         company, _, role = pair.partition("::")
         if not role:
-            print(f"⚠ «{pair}»: без ::Роль проверяется только компания — для решения о подаче мало")
+            print(f"⚠ {pair}: no ::Role given — company-only check, not enough to decide")
         verdict, hits = check(rows, company, role, url)
         if verdict == "dup":
             worst = 1
-            print(f"⛔ {pair}: уже есть — " + "; ".join(f"{h['id']} [{h['status']}]" for h in hits))
+            print(f"⛔ {pair}: duplicate — " + "; ".join(f"{h['id']} [{h['status']}]" for h in hits))
         elif verdict == "company":
-            print(f"⚠ {pair}: компания есть, роль ДРУГАЯ. Ранее: "
+            print(f"⚠ {pair}: same company, DIFFERENT role. Before: "
                   + "; ".join(f"{h['role']} [{h['status']}]" for h in hits))
         else:
-            print(f"✅ {pair}: нового нет в трекере")
+            print(f"✅ {pair}: new")
     return worst
 
 
 def cmd_set(a) -> int:
     if a.status not in STATUSES:
-        print(f"Статус «{a.status}» не из списка: {', '.join(STATUSES)}")
+        print(f"status {a.status} not in: {', '.join(STATUSES)}")
         return 2
     rows = load()
     r = find(rows, a.key)
     if not r:
-        print(f"Не нашёл «{a.key}». Сперва add.")
+        print(f"not found: {a.key} — add it first")
         return 1
     today = date.today().isoformat()
+    prev = r["status"]
+    days = (date.today() - datetime.fromisoformat(r["applied_at"]).date()).days if r.get("applied_at") else None
     r["status"], r["updated_at"] = a.status, today
     if a.status == "applied" and not r.get("applied_at"):
         r["applied_at"] = today
@@ -172,6 +167,8 @@ def cmd_set(a) -> int:
     if a.next:
         r["next_action"], r["next_date"] = a.next, a.date or ""
     save(rows)
+    log("status", id=r["id"], frm=prev, to=a.status, track=r.get("track"), source=(r.get("source") or "").split(":")[0],
+        score=r.get("score"), days_since_applied=days, reason=(a.comment or "")[:40] if a.status == "skipped" else None)
     print(f"✅ {r['id']} -> {a.status}")
     return 0
 
@@ -184,21 +181,21 @@ def cmd_list(a) -> int:
         rows = [r for r in rows if norm_company(a.company) in norm_company(r["company"])]
     for r in rows:
         print(f"{r['status']:<10} {r['score'] or '-':>3}  {r['company']} — {r['role']}  {r['url']}")
-    print(f"\nвсего: {len(rows)}")
+    print(f"total: {len(rows)}")
     return 0
 
 
 def cmd_funnel(_a) -> int:
     rows = load()
     by = {s: sum(r["status"] == s for r in rows) for s in STATUSES}
-    applied = sum(by[s] for s in STATUSES[2:])  # всё, что дошло до подачи и дальше
-    print(f"Всего вакансий: {len(rows)}")
+    applied = sum(by[s] for s in STATUSES[2:])  # everything that reached applied or later
+    print(f"leads: {len(rows)}")
     for s in STATUSES:
         if by[s]:
             print(f"  {s:<10} {by[s]}")
     reached = applied - by["applied"] - by["withdrawn"] - by["skipped"]
     if applied:
-        print(f"\nКонверсия подача -> любой ответ компании: {reached}/{applied} = {reached / applied:.0%}")
+        print(f"applied -> any company response: {reached}/{applied} = {reached / applied:.0%}")
     return 0
 
 
@@ -211,9 +208,9 @@ def cmd_due(_a) -> int:
              and (date.today() - datetime.fromisoformat(r["applied_at"]).date()).days >= 7
              and not r.get("next_action")]
     for r in stale:
-        print(f"тишина 7+ дней: {r['company']} — {r['role']} (подано {r['applied_at']}) -> follow-up?")
+        print(f"silent 7+ days: {r['company']} — {r['role']} (applied {r['applied_at']}) -> follow-up?")
     if not rows and not stale:
-        print("На сегодня дел нет.")
+        print("nothing due today")
     return 0
 
 

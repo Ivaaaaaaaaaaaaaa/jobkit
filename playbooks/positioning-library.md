@@ -1,131 +1,46 @@
-# Библиотека позиционирования
+# Positioning library (used by /jobkit:positioning)
 
-Используется командой `/positioning`. Здесь — типовые треки для продуктовых ролей (и соседних).
-Агент выбирает 2–4 трека, которые **доказаны** опытом из `me/experience-bank.md`, адаптирует
-под человека и записывает в `me/positioning.md`. Трек без доказательства не предлагаем.
+Pick 2–4 tracks that the bank PROVES. A track with zero supporting facts is not offered.
 
-## Как выбирать треки
+## Rules
+- Two registers: truth (what happened) and pitch (how it's framed). Pitch numbers and titles are
+  real; weak signals (tiny team, short tenure, "founders decided") aren't volunteered, never lied about.
+- Bullet = result → how → tools. A strength is tied to the job where it was proven.
+- Title within one step of reality; never jump two levels.
 
-1. Выписать из банка 5–8 самых сильных фактов (с цифрами).
-2. Для каждого трека ниже: сколько сильных фактов его подтверждают? Ноль — трек не наш.
-3. Взять 2–4 трека с лучшим покрытием. Первый — тот, где покрытие лучше и рынок шире.
-4. Для каждого написать: тайтл, фразу, шаблон саммари, истории, «не выпячиваем», ключевые
-   слова, ступень по деньгам.
-5. Показать человеку 2–3 варианта саммари на каждый трек — пусть выберет голос.
-6. Предложить гипотезу проверки: какой трек вероятно конвертит лучше и как это измерить.
+## Tracks (title · for · proof · keywords)
+1. **Generalist PM** — Product Manager / Product Owner / PM · {domain}. Most PM roles. Proof: launch,
+   metric before/after, discovery. KW: discovery, roadmap, prioritization, KPIs, cross-functional, A/B.
+2. **Growth PM** — Growth PM / PM, Growth / PM, Monetization. Consumer, mobile, PLG, marketplaces.
+   Proof: experiments with results, funnel metrics. Few tests → say "experiments", not "A/B platform".
+   KW: experimentation, funnel, activation, retention, monetization, cohort.
+3. **Technical / Platform PM** — Technical PM / PM, Platform/API. Dev tools, data platforms,
+   integrations. Proof: APIs, migrations, eng/QA/analyst background. Don't pose as an engineer.
+   KW: API, platform, integrations, developer experience.
+4. **Data-minded PM** — PM, Data / Analytics. Proof: hands-on SQL, dashboards, analyst past.
+   KW: SQL, metrics, data-driven, insights.
+5. **AI PM** — AI PM / PM, AI / AI Transformation. Proof: shipped AI feature, automation savings,
+   agents/prompts, quality evaluation. Applied level only — no RAG/fine-tuning/ML unless hands-on.
+   KW: LLM, AI agents, automation, evaluation, ROI.
+6. **Founding / 0→1** — Founding PM / PM, 0→1. Early startups, "first PM", new bets. Proof: zero-to-
+   launch, own MVP, first customers, pivot. For corporates don't say "I want my own startup".
+7. **B2B SaaS / Enterprise** — PM, B2B. Proof: business customers, work with sales, implementations.
+   KW: stakeholders, enterprise, onboarding, churn, integrations.
+8. **Consumer / Mobile** — Proof: DAU/MAU, retention, store ratings, redesign with results.
+9. **Domain specialist** — PM · {Domain} (fintech, health, edtech, e-com, games, logistics).
+   Short tenure → "fast entry into regulated domains".
+10. **Product Owner** (agile / enterprise / outsourcing) — backlog, sprints, acceptance, client work.
+    In product companies "PO" may read as "no product decisions" → use track 1 if decisions were real.
+11. **Adjacent entry** when PM roles are scarce: Product Analyst (metrics, SQL), Product Ops (process,
+    tools), APM programs, Business Analyst, Project/Delivery, Customer Success/Solutions, AI
+    Implementation/Automation.
 
-## Правила любой подачи
+## Summary templates (3–4 sentences, about self, no "you")
+- Result-first: "{Title} with {N} years in {domains}. {Best result + number}. {How you work}. {Edge}."
+- Problem-first: "Product manager who turns {problem type} into {result type}. At {company} {result}. {Second result}. {Method/stack}."
+- Junior: "{Title} with hands-on experience in {what}. {Most tangible result + number}. Background in {past job}, which gives {benefit}. {What you're building/learning now}."
 
-- **Два регистра.** Правда (что было на самом деле) и питч (как подать). Цифры и тайтлы в питче
-  настоящие. Слабые сигналы (маленькая команда, короткий срок, «решали фаундеры») сами не
-  выпячиваем, но и не врём, если спросят.
-- **Каждый буллет — результат → как → чем.** Сначала цифра, потом действие, потом инструмент.
-- **Сильная сторона привязана к месту, где она доказана.** Не приписывать удержание компании,
-  где удержанием не занимался(лась).
-- **Уровень тайтла — на ступень вокруг реального.** Junior с реальным владением фичей → «Product
-  Manager». Middle с владением продуктом → «Product Manager» / «Senior PM» только если JD
-  совпадает по требованиям. Не прыгать на две ступени.
-
-## Треки
-
-### 1. Generalist PM — «владею фичей/продуктом от проблемы до метрики»
-- **Для:** большинство вакансий PM в продуктовых компаниях.
-- **Тайтл:** Product Manager · запасные: Product Owner, Product Manager · {домен}.
-- **Фраза:** «Нахожу проблему, за которую пользователь держится, довожу решение до метрики».
-- **Саммари:** кто ты и сколько лет → лучший результат с цифрой → как работаешь (discovery,
-  данные, кросс-функциональная команда) → в каких продуктах.
-- **Доказательства:** запуск, метрика до/после, discovery-интервью.
-- **Ключевые слова:** discovery, roadmap, prioritization, KPIs, cross-functional, A/B.
-
-### 2. Growth PM — «двигаю воронку: активация, конверсия, удержание, монетизация»
-- **Для:** consumer, мобильные приложения, PLG SaaS, маркетплейсы.
-- **Тайтл:** Growth Product Manager · Product Manager, Growth · Product Manager · Monetization.
-- **Фраза:** «Ищу узкие места в воронке и снимаю их экспериментами».
-- **Саммари:** метрика воронки с цифрой → число экспериментов и win-rate → аналитический стек.
-- **Доказательства:** A/B-тесты с результатом, конверсия/удержание/ARPU до-после.
-- **Не выпячиваем:** если A/B было мало — говорим «эксперименты», не «A/B-платформа».
-- **Ключевые слова:** experimentation, funnel, activation, retention, monetization, cohort.
-
-### 3. Technical / Platform PM — «разговариваю с инженерами на их языке»
-- **Для:** API, девтулзы, платформы данных, интеграции, B2B-инфраструктура.
-- **Тайтл:** Technical Product Manager · Product Manager · Platform/API.
-- **Фраза:** «Перевожу бизнес-задачу в архитектурное решение и обратно».
-- **Доказательства:** интеграции, API, миграции, техническое образование, бэкграунд разработчика/QA/аналитика.
-- **Честный потолок:** не выдавать себя за инженера; сводить разговор к результату.
-- **Ключевые слова:** API, platform, integrations, developer experience, technical roadmap.
-
-### 4. Data / Analytics-minded PM — «решения на данных»
-- **Для:** продукты с большими данными, аналитические продукты, B2B-аналитика.
-- **Тайтл:** Product Manager · Data · Product Manager (Analytics).
-- **Доказательства:** SQL руками, дашборды, метрики, модели, переход из аналитика.
-- **Ключевые слова:** SQL, metrics, data-driven, dashboards, experimentation, insights.
-
-### 5. AI PM — «внедряю ИИ так, чтобы он приносил цифру»
-- **Для:** AI-продукты, AI-фичи, внутренняя автоматизация, LLM-агенты.
-- **Тайтл:** AI Product Manager · Product Manager · AI · AI Transformation Manager.
-- **Фраза:** «Нахожу, где ИИ окупается, запускаю и меряю результат».
-- **Доказательства:** запущенная AI-фича, автоматизация с экономией, промпты/агенты, оценка качества.
-- **Честный потолок:** прикладной уровень, не ML-исследования. Не писать RAG / fine-tuning / ML,
-  если не делал(а) руками.
-- **Ключевые слова:** LLM, AI agents, automation, evaluation, prompt design, ROI.
-
-### 6. Founding / 0→1 PM — «запускаю с нуля»
-- **Для:** ранние стартапы, «first PM», новые направления в корпорациях.
-- **Тайтл:** Founding Product Manager · Product Manager · 0→1.
-- **Фраза:** «Довожу продукт от идеи до первых платящих пользователей, быстро и дёшево».
-- **Доказательства:** запуск с нуля, MVP своими руками, первые клиенты, пивот.
-- **Не выпячиваем (для корпораций):** «хочу свой стартап» — читается как риск ухода.
-- **Ключевые слова:** 0→1, MVP, validation, product-market fit, founder mindset.
-
-### 7. B2B SaaS / Enterprise PM — «продаю и внедряю в бизнес»
-- **Для:** B2B SaaS, CRM/ERP-подобные продукты, enterprise.
-- **Тайтл:** Product Manager · B2B · Product Manager · Enterprise.
-- **Доказательства:** работа с клиентами-компаниями, продажи вместе с sales, внедрения, кастомизации.
-- **Ключевые слова:** B2B, stakeholders, enterprise customers, onboarding, churn, integrations.
-
-### 8. Consumer / Mobile PM — «приложения, которые открывают каждый день»
-- **Для:** мобильные приложения, consumer-сервисы, медиа, игры (не гемблинг).
-- **Доказательства:** DAU/MAU, удержание, оценки в сторах, редизайн с результатом.
-- **Ключевые слова:** mobile, retention, engagement, UX, app store, push.
-
-### 9. Domain specialist — «знаю отрасль изнутри»
-- **Для:** финтех, healthtech, edtech, e-commerce, геймдев, логистика — где ценят домен.
-- **Тайтл:** Product Manager · {Domain}.
-- **Доказательства:** годы в отрасли, регуляторика, отраслевые метрики.
-- **Не выпячиваем:** короткий стаж в домене — подаём как «быстро вхожу в регулируемые домены».
-
-### 10. Product Owner (Agile / enterprise / аутсорс)
-- **Для:** банки, корпорации, аутсорс-компании, где PO = владелец бэклога.
-- **Тайтл:** Product Owner · Product Owner / Product Manager.
-- **Доказательства:** бэклог, спринты, приёмка, требования, работа с заказчиком.
-- **Риск:** в продуктовых компаниях «PO» читается как «не принимает продуктовые решения» — там
-  использовать трек 1, если решения правда принимались.
-
-### 11. Соседние роли — запасной вход
-Когда PM-вакансий мало или опыта не хватает, те же факты подаются на соседние роли:
-| Роль | Что переносим |
-|---|---|
-| Product Analyst | метрики, SQL, эксперименты |
-| Product Operations | процессы, инструменты, метрики команды |
-| Associate PM / APM-программы | любой продуктовый опыт + обучаемость |
-| Business Analyst | требования, процессы, работа с заказчиком |
-| Project / Delivery Manager | сроки, команда, запуски |
-| Customer Success / Solutions | работа с клиентом, внедрения |
-| AI Implementation / Automation Lead | автоматизация с результатом |
-
-## Шаблоны саммари (на выбор голоса)
-
-Каждый — 3–4 предложения, о себе, без «you». `{}` — подставить из банка.
-
-- **Результат первым:** «{Тайтл} with {N} years in {домены}. {Лучший результат с цифрой}.
-  {Как работаешь — 1 фраза}. {Чем отличаешься — 1 фраза}.»
-- **Проблема первым:** «Product manager who turns {тип проблемы} into {тип результата}.
-  At {компания} {результат с цифрой}. {Второй результат}. {Стек/метод}.»
-- **Для джуна:** «{Тайтл} with hands-on experience in {что делал}. {Самый осязаемый результат,
-  даже маленький, с цифрой}. Background in {прошлая профессия}, which gives {польза}. {Что
-  изучаешь/строишь сейчас}.»
-
-## Что записать в `me/positioning.md`
-
-По каждому выбранному треку — все поля шаблона. Плюс «Отличие от других кандидатов» (3 пункта
-с доказательствами), «Что заводит», и 1–2 гипотезы проверки (какой трек конвертит лучше).
+## Per track write to me/positioning.md
+For which roles · title + fallbacks · one-liner · summary template · lead stories · lean into ·
+don't volunteer · keywords · salary tier. Plus: 3 differentiators with proof, what motivates, 1–2
+hypotheses (which track converts better; one variable at a time; <15 applications per track = no conclusion).

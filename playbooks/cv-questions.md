@@ -1,134 +1,60 @@
-# Разбор опыта для CV — банк вопросов
+# Experience interview — question bank (used by /jobkit:cv-interview)
 
-Используется командой `/cv-interview`. Цель — вытащить из человека **доказанные результаты с
-цифрами** и истории для интервью. Люди помнят задачи («делал онбординг»), а не результаты
-(«онбординг стал конвертировать на 12 п.п. лучше»). Задача агента — превращать первое во второе.
+People remember tasks ("did onboarding"), not results ("onboarding converts 12 pp better").
+Turn the first into the second. Ask in the user's language; write the bank/CV in `docs_language`.
 
-## Как вести
+## Rules
+- One job at a time, newest first. Last 2–3 jobs in depth; older than 5 years — one line.
+- Each answer → draft bullet "result → how → tools", show it.
+- Never suggest numbers. No number → section E, mark "≈".
+- "We did" → "what did *you* do? would it have happened without you?"
 
-- **Одно место работы за раз**, от свежего к старому. Последние 2–3 места — подробно, старше
-  5 лет — одной строкой.
-- По каждому месту: контекст (блок A) → достижения (блок B, раскопка) → инструменты и процессы
-  (C) → истории для интервью (D). Не все вопросы — только те, где пусто.
-- Каждый ответ сразу превращать в черновик буллета и показывать: «Записал так: … Верно?»
-- Цифры не подсказывать «из головы». Нет цифры — помочь **оценить** (блок E) и пометить «≈».
-- Не принимать «мы сделали». Спрашивать: «А что лично ты? Без тебя это случилось бы?»
-- После каждого места — записать в `me/experience-bank.md` и `me/cv/base.yaml`.
+## A. Context
+1. What does the company do, for whom; users/clients/revenue roughly?
+2. Stage (pre-revenue / growing / corporate); headcount overall and in product?
+3. Which product or part was yours; who were the users?
+4. Daily team: how many devs, designers, analysts; who did you report to?
+5. Official title; what the role was in substance (→ `title_options`, honest only).
+6. Why joined, why left (interview only, not CV).
 
-## A. Контекст места работы
+## B. Achievements (start open: "what are you proudest of here?")
+- **Launches:** what did you ship from scratch; how many use it; time idea→launch vs usual?
+- **Product metrics:** which did you move (conversion, retention, activation, revenue, ARPU, NPS,
+  time-on-task); before/after even roughly; over what period and audience?
+- **Money/efficiency:** revenue or savings; hours/people/costs saved; what did you automate?
+- **Decisions:** what did you decide NOT to do and were right; what did you kill; a data-backed disagreement?
+- **Discovery:** how many user interviews; what came out; research/usability tests that changed things?
+- **Experiments:** how many A/B tests; best win; the failure that taught most?
+- **People/process:** hired, onboarded, mentored whom; process you built or fixed; vendors/budget?
+- **Complexity:** hardest technical or org thing you pushed through; integrations, platform, compliance?
 
-1. Что делает компания и для кого? Сколько пользователей / клиентов / выручка — примерно?
-2. Стадия: стартап до денег, растущий, корпорация? Сколько людей в компании и в продукте?
-3. Какой продукт или часть продукта была твоей? Кто пользователи?
-4. С кем работал каждый день: сколько разработчиков, дизайнеров, аналитиков? Кому подчинялся?
-5. Как назывался твой тайтл официально? Как бы ты назвал(а) роль по сути? (→ `title_options`,
-   только честные варианты: «Product Owner» → «Product Manager», если владел(а) решениями.)
-6. Почему пришёл(шла) и почему ушёл(ла)? (Для интервью, не для CV.)
+## C. Tools and methods
+Analytics (Amplitude/Mixpanel/GA/SQL/Excel — hands-on or dashboards?), design/prototyping (Figma,
+no-code, code with AI tools), delivery (Jira/Linear/Notion), methods actually used (CJM, JTBD, RICE,
+OKR, unit economics), AI at work (concrete: "built X, saves Y"). Level: "do myself" / "understand
+and direct" / "heard of" — only the first two go to the CV.
 
-## B. Раскопка достижений
+## D. STAR stories (6–8): Situation → Task → Action → Result with a number
+Launch · failure · conflict · prioritization · influence without authority · data changed my mind ·
+ambiguity · hardest customer.
 
-Начать с открытого: «Чем ты больше всего гордишься на этом месте?» — потом по списку.
+## E. No number — honest estimate
+"How many people saw it per day/month?" (base) · "more like +5% or +50%?" (order) · "hours per week
+before vs after?" (savings) · "what would a contractor charge?" (money) · "where can it be checked —
+dashboard, report, email?". Write "≈30%" and note in the bank how it was estimated; no method → no number.
 
-**Запуски**
-- Что запустил(а) с нуля? Сколько людей этим пользуется? Что было бы без этого?
-- Сколько времени от идеи до запуска? Это быстрее, чем обычно в компании?
+## F. Junior / career switch
+Previous profession (analyst, QA, marketing, support, dev, PM-adjacent): which product decisions
+did you make or influence? Pet projects (users, learnings), courses with full cases, internships,
+hackathons, freelance — with results. Product work without the title: who decided what to build and
+collected feedback?
 
-**Метрики продукта**
-- Какие метрики ты двигал(а)? Конверсия, удержание, активация, выручка, ARPU, NPS, время на задачу?
-- Какие были «до» и «после»? Даже грубо: «было где-то 20%, стало около 30%».
-- За какой период? На какой аудитории?
-
-**Деньги и эффективность**
-- Твоя работа принесла деньги? Сэкономила? Сколько часов, людей, затрат?
-- Что-то автоматизировал(а)? Сколько ручной работы ушло?
-
-**Решения и приоритизация**
-- Что ты решил(а) **не** делать, и это оказалось правильным? Что убил(а)?
-- Был спор с руководством / командой, где ты настоял(а) на данных? Чем кончилось?
-
-**Discovery и пользователи**
-- Сколько интервью с пользователями провёл(а)? Что из них родилось?
-- Исследования, опросы, юзабилити-тесты — что поменялось после?
-
-**Эксперименты**
-- A/B-тесты: сколько, какой самый удачный, какой провал научил?
-
-**Люди и процессы**
-- Кого нанял(а), онбордил(а), менторил(а)? Сколько людей?
-- Какой процесс построил(а) или починил(а): планирование, релизы, метрики, документация?
-- Вёл(а) ли подрядчиков, бюджет, вендоров?
-
-**Масштаб и сложность**
-- Самая сложная техническая или организационная штука, которую ты протащил(а)?
-- Интеграции, платформа, API, регуляторика, безопасность?
-
-## C. Инструменты и процессы
-
-- Аналитика: Amplitude / Mixpanel / GA / SQL / Excel — что сам(а) руками, что смотрел(а) в дашбордах?
-- Дизайн и прототипы: Figma, no-code, прототипы в коде (Cursor, Claude Code)?
-- Управление: Jira, Linear, Notion, Confluence?
-- Методы: CJM, JTBD, RICE, OKR, unit-экономика, roadmap — что реально применял(а)?
-- ИИ: используешь ли ИИ в работе? Как именно (не «использую ChatGPT», а «собрал(а) X, это экономит Y»)?
-- Честно отметить уровень: «делаю сам(а)» / «понимаю и ставлю задачи» / «слышал(а)».
-  Только первые два — в CV.
-
-## D. Истории для интервью (STAR)
-
-Собрать 6–8 историй, по одной на тему. Для каждой: Ситуация → Задача → Действие → Результат с цифрой.
-
-| Тема | Вопрос-затравка |
-|---|---|
-| Запуск | Расскажи о продукте/фиче, которую довёл(а) от идеи до пользователей |
-| Провал | Что пошло не так по твоей вине и что ты вынес(ла) |
-| Конфликт | Спор с разработкой / дизайном / бизнесом — как решили |
-| Приоритизация | Как выбирал(а) из многих задач, что делать, и что отказал(а) |
-| Влияние без власти | Как убедил(а) людей, которые тебе не подчиняются |
-| Решение на данных | Когда данные перевернули твоё мнение |
-| Неясность | Задача без чёткой постановки — как разобрался(лась) |
-| Клиент | Самый сложный пользователь / клиент и что из этого вышло |
-
-## E. Когда цифры нет — честная оценка
-
-Цифра «≈» лучше, чем «улучшил конверсию». Вопросы, чтобы оценить:
-- «Сколько примерно людей в день/месяц это видели?» → база.
-- «Это было больше похоже на +5% или +50%?» → порядок.
-- «Сколько часов в неделю команда тратила до и после?» → экономия.
-- «Сколько это стоило бы, если бы делали подрядчиком?» → деньги.
-- «Где это можно проверить — дашборд, отчёт, письмо?» → если доступ ещё есть, попросить глянуть.
-
-Правило: оценку пишем как «≈30%» или «around 30%» и в банке рядом — как посчитано. Без способа
-посчитать цифру не пишем, пишем результат словами.
-
-## F. Для джуна и смены профессии
-
-Опыта в продукте мало — добираем из соседнего:
-- Прошлая профессия (аналитик, QA, маркетинг, саппорт, разработка, проджект): какие продуктовые
-  решения ты принимал(а) или на какие влиял(а)? Что улучшил(а) для пользователя?
-- Пет-проекты: что сделал(а), сколько пользователей, что узнал(а) из запуска?
-- Курсы и кейсы: какой кейс разобран целиком (проблема → гипотезы → решение → метрики)?
-- Стажировки, хакатоны, волонтёрство, фриланс — с результатом.
-- «Продуктовая» работа без тайтла: кто реально решал, что делать, и собирал обратную связь?
-
-## G. Вариации CV — что собрать по итогам
-
-После разбора предложить человеку набор CV, а не одно:
-
-| Вариант | Когда | Что меняется |
+## G. CV variants to propose
+| Variant | When | Changes |
 |---|---|---|
-| Базовое | По умолчанию, массовые подачи | Тайтл трека A, сбалансированные буллеты |
-| Под трек B/C из `me/positioning.md` | Вакансии этого трека | Тайтл, саммари, первые буллеты, порядок навыков |
-| Короткое (1 стр.) | Всегда, если опыт < 10 лет | Только свежие 4–5 лет, ≤ 4 буллета на роль |
-| Подробное (2 стр.) | Только если просят «full history» | Всё, включая старое |
-| На русском | Русскоязычные компании и рекрутёры | Перевод + локальные термины |
-| Под конкретную вакансию | Каждая подача | overlay в `data/applications/<id>/cv.yaml` |
-
-Каждый вариант — overlay-файл, а не копия Word: `me/cv/variant-<трек>.yaml`, рендер —
-`python3 scripts/render_cv.py me/cv/variant-<трек>.yaml`.
-
-## Итог `/cv-interview`
-
-1. `me/experience-bank.md` — все места, достижения с цифрами (или «≈» со способом), истории.
-2. `me/cv/base.yaml` — все буллеты по формуле «результат → как → чем».
-3. Раздел «Чего нет» и `banned_claims` — дополнены тем, что выяснилось.
-4. Отрендерено базовое CV, показано человеку, `text_audit.py` по саммари — ok.
-5. Предложение: «Теперь позиционирование — /positioning».
+| Base | default | track A title, balanced bullets |
+| Per track (`me/cv/variant-<track>.yaml`) | that track's roles | title, summary, lead bullets, skill order |
+| One page | always if < 10 yrs | last 4–5 yrs, ≤4 bullets per role |
+| Two pages | only if "full history" asked | everything |
+| Other language | local companies/recruiters | translation + local terms |
+| Per vacancy | every application | `data/applications/<id>/cv.yaml` |

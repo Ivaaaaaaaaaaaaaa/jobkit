@@ -1,100 +1,41 @@
-# Онбординг — сценарий для агента
+# Onboarding script (used by /jobkit:setup)
 
-Цель: за 30–60 минут разговора заполнить `me/` так, чтобы дальше агент работал без вопросов.
-Запускается командой `/onboard`. Можно прервать и продолжить: агент смотрит, что уже заполнено,
-и продолжает с первого пустого блока.
+Goal: in 30–60 min of conversation fill `me/` so later runs need no questions. Resumable.
 
-## Как вести разговор
+## How to talk
+- Friendly, businesslike, no judgement — job search is stressful.
+- One phase at a time, 3–6 questions. Take what exists (CV, LinkedIn) first, ask only gaps.
+- After each phase write files and show a short summary: "correct me if wrong".
+- Unknown answer → propose a default, mark TODO, move on.
+- Sensitive (citizenship, money): say why and where it's stored ("only in me/ on this computer").
 
-- Тон — дружелюбный и деловой. Человек ищет работу, это стрессово: без канцелярита и без оценок.
-- **Один блок за раз, 3–6 вопросов в блоке.** Не вываливать анкету на 40 пунктов.
-- Сначала **забрать то, что уже есть** (CV, LinkedIn), потом спрашивать только пробелы.
-- После каждого блока — записать в файл и показать коротко, что записано. «Поправь, если не так».
-- Если человек не знает ответа — предложить вариант по умолчанию и пометить TODO, не застревать.
-- Чувствительное (гражданство, деньги, статус) — объяснить, зачем спрашиваем и где это хранится:
-  «только в папке me/ на твоём компьютере, никуда не отправляется».
-- Правь файлы `me/` точечно (Edit), а не перезаписью через yaml-дамп: комментарии в шаблонах —
-  подсказки для человека, их надо сохранить.
-- Используй AskUserQuestion для вопросов с вариантами (формат работы, уровень, автономность) —
-  это быстрее, чем печатать.
+## Browser
+Forms need the Claude in Chrome extension: Chrome Web Store → "Claude" → install → sign in with the
+same Claude account → allow. Check with ToolSearch `claude-in-chrome` + `tabs_context_mcp`.
 
-## Шаг 0. Подготовка папки (агент делает сам)
+## Phase 1 — what exists
+CV file, LinkedIn PDF (Profile → More → Save to PDF), portfolio/case links, previous applications
+(table → `jk t add ... --status applied` each, so we never apply twice). `jk import` each file,
+then fill bank + base.yaml; show "found 4 jobs, 11 achievements, 6 with numbers; gaps: …".
 
-1. Создать `me/`, `me/cv/`, `data/`, `data/applications/`.
-2. Скопировать шаблоны: `templates/*.md|yaml` → `me/`, `templates/cv/base.yaml` → `me/cv/`.
-   Уже существующие файлы **не перезаписывать**.
-3. Проверить окружение: `python3 scripts/doctor.py`. Нет пакетов — предложить
-   `python3 -m pip install -r requirements.txt` (или venv: `python3 -m venv .venv &&
-   .venv/bin/pip install -r requirements.txt`) и выполнить после «ок».
-4. Сказать человеку план: «Пять блоков: что у тебя есть → кто ты и что ищешь → где и за сколько
-   → как работаем → проверка. Потом отдельно разберём опыт для CV (/cv-interview) и позиционирование
-   (/positioning)».
+## Phase 2 — who and what → profile: name, target, search
+Name (Latin, as on LinkedIn) · target roles (offer options from experience) · honest level, stretch
+up? · domains wanted / avoided · company stage. Build `title_include` / `title_exclude`, show them.
 
-## Блок 1. Что уже есть
+## Phase 3 — where and how much → geo, work_authorization, salary, contacts
+Current city · formats (remote/hybrid/office + cities) · relocation and where · citizenship, where
+they can work without a visa, contractor entity? · salary: currency, period, gross/net, target, floor
+(don't know the market → offer a quick estimate from 20–30 postings with published bands) ·
+contacts (recommend a separate job-search email), phone in international format.
+Fill application-answers §1–3 incl. three salary tiers (≈ +10–15% / target / −10–15%), user edits.
 
-Спросить:
-- «Пришли текущее резюме — перетащи файл (PDF/DOCX) сюда или укажи путь».
-- «Ссылка на LinkedIn? Можно сохранить профиль как PDF: Профиль → Ещё → Сохранить в PDF».
-- «Есть портфолио, кейсы, статьи, пет-проекты? Ссылки».
-- «Были отклики раньше? Если есть таблица — пришли, заведём в трекер, чтобы не подаваться дважды».
+## Phase 4 — how we work → autonomy, skip_companies, banned_claims
+Who presses Submit (recommend `confirm_each` for the first 1–2 weeks) · applications per run ·
+companies to skip (ex-employers, past rejections) · what they do NOT have → banned_claims + bank §7
+(typical: "managed a team", "SQL", "B2B", "machine learning") · tracker backend (csv default;
+playbooks/data-storage.md).
 
-Сделать:
-- Прочитать файлы. Разложить факты по `me/experience-bank.md` (места работы, даты, буллеты,
-  образование, языки) и по `me/cv/base.yaml`. Цифры — как есть, с пометкой «из CV, проверить».
-- Старые отклики → `scripts/tracker.py add ... --status applied` по каждому.
-- Показать сводку: «Нашёл 4 места работы, 11 достижений, 6 с цифрами. Пробелы: …».
-
-## Блок 2. Кто ты и что ищешь → `me/profile.yaml` (name, target, search)
-
-- Имя латиницей, как в LinkedIn.
-- Какие роли ищем? Предложить варианты из опыта (Product Manager, Product Owner, Growth PM,
-  Product Analyst…). Можно несколько.
-- Уровень честно: junior / middle / senior. Подаёмся ли на ступень выше?
-- Домены, где хочется, и куда точно нет. Стадия компании: стартап / скейлап / корпорация / неважно.
-- Из ответов собрать `search.title_include` и `title_exclude` и показать: «Буду брать вакансии с
-  такими словами в названии… и пропускать с такими…».
-
-## Блок 3. Где и за сколько → `geo`, `work_authorization`, `salary`, контакты
-
-- Где живёшь сейчас? Формат: удалёнка / гибрид / офис — в каких городах?
-- Готов к переезду? Куда?
-- Гражданство и где есть право работать без визы. Нужна ли виза в других странах. Есть ли ИП /
-  своя компания для контракта.
-- Деньги: сколько хочешь и ниже чего не рассматриваешь. Валюта, в месяц или в год, на руки или
-  до налогов. Если человек не знает рынок — предложить сделать быструю оценку по открытым
-  вилкам похожих вакансий (поиск по 20–30 вакансиям с опубликованной вилкой) и вернуться к цифре.
-- Контакты для заявок: email (рекомендовать **отдельный ящик** под поиск — проще разбирать
-  ответы), телефон в международном формате, Telegram, ссылки.
-- Заполнить `me/application-answers.md` §1–3, включая таблицу ступеней по деньгам: агент
-  предлагает три ступени от названной цели (выше цели ~+10–15%, цель, ниже цели ~−10–15%), человек правит.
-
-## Блок 4. Как работаем → `autonomy`, `skip_companies`, `banned_claims`
-
-- Кто жмёт «Отправить»? Три варианта с объяснением (`confirm_each` — по умолчанию; `auto_high`;
-  `draft_only`). Рекомендовать `confirm_each` на первые 1–2 недели, пока человек не увидит качество.
-- Сколько подач за заход (по умолчанию 10).
-- Куда не подаёмся: бывшие работодатели, компании, где уже был отказ, неприятные.
-- Чего у тебя точно нет — навыки и слова, которые нельзя писать (→ `banned_claims` и банк §7).
-  Подсказать типичные: «руководил командой», «SQL», «B2B», «машинное обучение», «Agile-коуч».
-- Браузер: для заполнения форм нужен Claude in Chrome. Проверить, подключён ли
-  (`mcp__claude-in-chrome__tabs_context_mcp`). Нет — объяснить установку: расширение «Claude» в
-  Chrome Web Store, войти тем же аккаунтом Claude, разрешить. Без него работают поиск, CV и письма,
-  но формы — нет.
-- Где вести трекер: CSV (по умолчанию, ничего настраивать не надо), Notion или Google Sheets —
-  `playbooks/data-storage.md`.
-
-## Блок 5. Проверка и следующий шаг
-
-1. `python3 scripts/doctor.py --test` — показать результат.
-2. Пройтись по оставшимся TODO в `me/`: что срочно (контакты, цель, гео), что подождёт.
-3. Собрать базовое CV: `python3 scripts/render_cv.py --pdf` и показать файл.
-4. Предложить следующий шаг: «Дальше — разбор опыта (/cv-interview), он сделает CV сильнее.
-   Потом позиционирование (/positioning). Или сразу пробный поиск: /find».
-
-## Что считается готовым онбордингом
-
-- В `profile.yaml` нет TODO в: name, contacts.email, contacts.phone, contacts.city, target.roles,
-  target.seniority, search.title_include, geo.formats, work_authorization.can_work_in, autonomy.
-- В `application-answers.md` заполнены §1 и §2.
-- В `experience-bank.md` есть хотя бы места работы с датами.
-- `doctor.py` без ✗.
+## Done when
+profile has no TODO in name, contacts.email/phone/city, target.roles/seniority, search.title_include,
+geo.formats, work_authorization.can_work_in, autonomy; application-answers §1–2 filled; bank has
+jobs with dates; `jk setup --check` has no FAIL.

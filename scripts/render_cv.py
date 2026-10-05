@@ -1,27 +1,12 @@
 #!/usr/bin/env python3
-"""Сборка резюме в DOCX (и PDF) из данных, а не правкой Word-файла.
+"""Render a CV to DOCX (and PDF) from data, not by editing Word files.
 
-Почему так: CV под каждую вакансию отличается заголовком, саммари, порядком навыков и
-выбором буллетов, а тело (места работы, даты, цифры) одно. Поэтому:
-    me/cv/base.yaml                       — полное резюме: все роли, все буллеты, все навыки
-    data/applications/<id>/cv.yaml        — только то, что меняется под вакансию (overlay)
-Скрипт сливает их и рисует одностраничный DOCX в едином стиле.
+    me/cv/base.yaml                  full CV: all roles, bullets, skills
+    data/applications/<id>/cv.yaml   overlay: only what changes per vacancy
+    jk cv [overlay.yaml] [--pdf] | --selftest
 
-Запуск:
-    python scripts/render_cv.py                                  # базовое CV -> data/cv-base.docx
-    python scripts/render_cv.py data/applications/<id>/cv.yaml   # CV под вакансию -> рядом cv.docx
-    python scripts/render_cv.py <overlay> --pdf                  # + PDF (нужен LibreOffice или Word)
-    python scripts/render_cv.py --selftest
-
-Поля overlay (все необязательные):
-    title: "Product Manager · Growth"        # строка под именем
-    summary: "..."                           # 3–4 предложения
-    experience:                              # какие буллеты оставить у каждой роли и в каком порядке
-      <company>: [2, 0, 3]                   #   номера буллетов из base.yaml, с нуля
-    role_titles: {<company>: "Senior PM"}    # альтернативный тайтл роли (только из base.yaml -> title_options)
-    skills_order: ["Product", "Data"]        # порядок кластеров навыков
-    hide: ["<company>"]                      # роли, которые не показывать
-    file_name: "Name Surname CV - Acme"      # имя файла без расширения
+Overlay fields (all optional): title, summary, experience {company: [bullet indexes]},
+role_titles {company: title from title_options}, skills_order [groups], hide [companies], file_name.
 """
 from __future__ import annotations
 
@@ -31,8 +16,9 @@ import subprocess
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-BASE = ROOT / "me" / "cv" / "base.yaml"
+sys.path.insert(0, str(Path(__file__).parent))
+from paths import ME, DATA  # noqa: E402
+BASE = ME / "cv" / "base.yaml"
 
 
 def load_yaml(p: Path) -> dict:
@@ -59,8 +45,8 @@ def merge(base: dict, ov: dict) -> dict:
         if r.get("company") in titles:
             allowed = [r.get("role")] + (r.get("title_options") or [])
             if titles[r["company"]] not in allowed:
-                raise SystemExit(f"Тайтл «{titles[r['company']]}» для {r['company']} не из title_options "
-                                 f"в base.yaml — выдуманный тайтл в CV не ставим.")
+                raise SystemExit(f"title {titles[r['company']]!r} for {r['company']} is not in title_options "
+                                 f"in base.yaml — invented titles are not allowed")
             r["role"] = titles[r["company"]]
         roles.append(r)
     cv["experience"] = roles
@@ -80,7 +66,7 @@ def render(cv: dict, out: Path) -> Path:
 
     doc = Document()
     sec = doc.sections[0]
-    if str(cv.get("page", "A4")).upper() == "A4":      # Letter — для США: page: Letter
+    if str(cv.get("page", "A4")).upper() == "A4":      # US: page: Letter
         sec.page_width, sec.page_height = Cm(21), Cm(29.7)
     sec.top_margin = sec.bottom_margin = Cm(1.4)
     sec.left_margin = sec.right_margin = Cm(1.6)
@@ -201,17 +187,17 @@ def to_pdf(docx: Path) -> Path | None:
                        check=False, capture_output=True)
     else:
         try:
-            from docx2pdf import convert  # Word на Mac/Windows
+            from docx2pdf import convert  # uses MS Word on Mac/Windows
             convert(str(docx), str(docx.with_suffix(".pdf")))
         except Exception:
-            print("PDF не собран: нет LibreOffice (brew install --cask libreoffice) и нет docx2pdf.")
+            print("no PDF: install LibreOffice (brew install --cask libreoffice) or docx2pdf")
             return None
     pdf = docx.with_suffix(".pdf")
     return pdf if pdf.exists() else None
 
 
 def page_count_hint(cv: dict) -> int:
-    """Грубая оценка длины в строках: > ~58 строк почти наверняка вылезет на вторую страницу."""
+    """Rough line count: > ~58 lines almost surely spills onto page two."""
     n = 6 + (len(str(cv.get("summary", ""))) // 110 + 2)
     for r in cv.get("experience", []):
         n += 3 + sum(len(str(b)) // 105 + 1 for b in r.get("bullets", []))
@@ -233,7 +219,7 @@ def selftest() -> int:
     assert cv["skills"][0]["group"] == "Product" and cv["experience"][0]["role"] == "Product Lead"
     try:
         merge(base, {"role_titles": {"A": "CEO"}})
-        raise AssertionError("выдуманный тайтл прошёл")
+        raise AssertionError("invented title accepted")
     except SystemExit:
         pass
     import tempfile
@@ -248,7 +234,7 @@ def main() -> int:
         return selftest()
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     if not BASE.exists():
-        sys.exit("Нет me/cv/base.yaml — его собирает /cv-interview.")
+        sys.exit("no me/cv/base.yaml — run /setup or /cv-interview")
     base = load_yaml(BASE)
     if args:
         ov_path = Path(args[0])
@@ -258,12 +244,14 @@ def main() -> int:
         out = ov_path.parent / f"{name}.docx"
     else:
         cv = merge(base, {})
-        out = ROOT / "data" / f"{base.get('header', {}).get('name', 'CV')} CV.docx"
+        out = DATA / f"{base.get('header', {}).get('name', 'CV')} CV.docx"
     render(cv, out)
     lines = page_count_hint(cv)
+    from events import log
+    log("cv_render", kind="tailored" if args and "applications" in args[0] else ("variant" if args else "base"), lines=lines)
     print(f"DOCX: {out}")
     if lines > 58:
-        print(f"⚠ ~{lines} строк — скорее всего больше страницы. Убери буллеты в overlay -> experience.")
+        print(f"⚠ ~{lines} lines — likely over one page; drop bullets via overlay -> experience")
     if "--pdf" in sys.argv:
         pdf = to_pdf(out)
         if pdf:

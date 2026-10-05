@@ -1,67 +1,39 @@
-# Подготовка к интервью
+# Interview prep (used by /jobkit:interview-prep) → data/applications/<id>/prep.md
 
-Запускается `/interview-prep <компания или id>`. Результат — `data/applications/<id>/prep.md`.
+## 1. Collect
+Company (product, customers, business model, stage/funding, size, last-6-months news, competitors —
+site, blog, LinkedIn, Crunchbase, reviews, app stores) · product hands-on (free signup by the
+candidate; 3 strengths, 3 problems, 1 idea with hypothesis + metric) · top-5 requirements → STAR
+story each · interviewers' backgrounds · gaps → honest "what I lack and what instead".
 
-## 1. Что собрать
-
-1. **Компания:** продукт, клиенты, модель денег, стадия и раунды, размер, новости за полгода,
-   конкуренты. Источники: сайт, блог, LinkedIn компании, Crunchbase/Dealroom, отзывы, App Store.
-2. **Продукт руками:** зарегистрироваться (если бесплатно и без карты — сам кандидат), пройти
-   онбординг; 3 сильных места, 3 проблемы, 1 идея с гипотезой и метрикой.
-3. **Вакансия:** 5 главных требований → под каждое история из банка §6 (STAR, с цифрой).
-4. **Люди:** кто интервьюирует (LinkedIn), их бэкграунд — о чём им интересно.
-5. **Пробелы:** требования, которых нет, → честный ответ «чего нет и что взамен».
-
-## 2. Этапы и что на них проверяют
-
-| Этап | Проверяют | Готовим |
+## 2. Stages
+| Stage | Tests | Prepare |
 |---|---|---|
-| Рекрутёр | мотивация, деньги, сроки, базовый fit | питч 60 сек, «почему мы», вилка из application-answers, notice |
-| Нанимающий менеджер | опыт, мышление, уровень | 5–6 историй STAR, вопросы им |
-| Product sense / кейс | структура мышления | фреймворк: пользователь → проблема → решения → приоритет → метрика |
-| Аналитика / метрики | работа с данными | north star, дерево метрик, «метрика упала на 10% — что делаешь» |
-| Execution | приоритизация, конфликты, сроки | истории приоритизации и конфликта |
-| Тестовое | качество и скорость | уточнить объём и критерии; не больше 4–6 часов; сдать с резюме решения |
-| Финал / CEO | ценности, амбиции | «что сделаю за 90 дней», вопросы о стратегии |
+| Recruiter | motivation, money, timing, fit | 60-s pitch, why us, band (answers §3), notice |
+| Hiring manager | experience, thinking, level | 5–6 STAR stories, questions |
+| Product sense / case | structure | user → problem → solutions → priority → metric |
+| Metrics | data | north star, metric tree, "metric fell 10% — what do you do" |
+| Execution | prioritization, conflict, deadlines | those stories |
+| Take-home | quality, speed | clarify scope/criteria; ≤4–6 h; ship with a summary |
+| Final / CEO | values, ambition | 90-day plan, strategy questions |
 
-## 3. Типовые вопросы — заготовки
+## 3. Common questions → bullet answers from the bank
+About yourself (60–90 s) · why leaving · best launch / biggest failure · prioritization + saying no ·
+working with eng/design/data · how you know a feature worked · product you love · 2–3 years plan ·
+salary (ask their band first, then answers §3).
 
-- Расскажите о себе (60–90 секунд: кто → лучший результат → почему здесь).
-- Почему уходите / ушли?
-- Самый успешный запуск? Самый большой провал?
-- Как приоритизируете? Пример, когда отказали стейкхолдеру.
-- Как работаете с разработкой / дизайном / данными?
-- Как понять, что фича успешна?
-- Продукт, который любите, и что бы улучшили.
-- Где видите себя через 2–3 года?
-- Зарплатные ожидания — из application-answers §3, сперва спросить их вилку.
+## 4. Questions to them (pick 3–5)
+Main team metric and its trend · what makes the hire successful in 90 days · who has the final say ·
+why the role is open · how discovery works · biggest product problem now.
 
-Под каждый — ответ тезисами из банка, не сочинением. Цифры — только из банка.
+## 5. Mock
+5–7 stage questions; after each: what was strong, what lacked (numbers, structure, "I" vs "we"),
+an improved answer. New facts → bank.
 
-## 4. Вопросы к ним (выбрать 3–5)
+## 6. After
+prep.md notes (asked, landed, didn't, next steps) · `jk t set <id> interview "<stage>; next …" --next follow-up --date <tomorrow>` ·
+thank-you draft (contacts.md §5) · good answers → bank / application-answers.
 
-- Какая главная метрика у продукта/команды и как она менялась за полгода?
-- Что должно случиться за первые 90 дней, чтобы вы считали найм удачным?
-- Как принимаются продуктовые решения: кто последнее слово?
-- Почему открыта вакансия? Что случилось с предыдущим человеком?
-- Как устроены discovery и работа с пользователями?
-- Самая большая проблема продукта сейчас?
-
-## 5. Мок-интервью
-
-Предложить кандидату прогон: агент задаёт 5–7 вопросов по этапу, после каждого — короткий
-разбор (что сильно, чего не хватило: цифры, структура, «я» вместо «мы»), и вариант улучшенного
-ответа. Новые факты из ответов — в банк.
-
-## 6. После интервью
-
-1. Записать в `prep.md`: что спрашивали, что зашло, что нет, следующие шаги и сроки.
-2. `tracker.py set <id> interview "<этап>, следующий: ..." --next "follow-up" --date <завтра>`.
-3. Черновик благодарности (contacts.md §5).
-4. Новые вопросы и удачные ответы — в банк и в application-answers.
-
-## 7. Оффер
-
-Сравнить с целью и порогом из профиля; посчитать на руки; уточнить: состав (база, бонус, опционы),
-испытательный срок, формат, отпуск, оборудование. Торг — по фактам (другие офферы, рынок, уникальный
-опыт). Принимает и подписывает — только кандидат.
+## 7. Offer
+Compare with target/floor; compute take-home; clarify base/bonus/equity, probation, format, leave,
+equipment. Negotiate with facts (other offers, market, rare experience). Only the candidate accepts and signs.

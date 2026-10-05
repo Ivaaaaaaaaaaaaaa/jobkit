@@ -1,8 +1,4 @@
-"""Общее для скриптов: профиль, HTTP, фильтры по названию роли и по гео.
-
-Все пороги и ключевые слова живут в me/profile.yaml, а не в коде, — поэтому один и тот же
-код работает для продакта, аналитика или дизайнера: меняется только профиль.
-"""
+"""Shared helpers: profile, HTTP, title and geo gates. All thresholds live in me/profile.yaml."""
 from __future__ import annotations
 
 import json
@@ -13,9 +9,9 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-ME = ROOT / "me"
-DATA = ROOT / "data"
+sys.path.insert(0, str(Path(__file__).parent))
+from paths import FRAMEWORK, HOME, ME, DATA  # noqa: E402
+ROOT = FRAMEWORK
 PROFILE = ME / "profile.yaml"
 
 UA = {"User-Agent": "Mozilla/5.0 (Macintosh) Chrome/126 job-search-kit", "Accept": "application/json"}
@@ -26,9 +22,9 @@ def load_profile() -> dict:
     try:
         import yaml
     except ImportError:
-        sys.exit("Нет pyyaml. Поставь: pip install -r requirements.txt")
+        sys.exit("pyyaml missing — run: jk setup")
     if not PROFILE.exists():
-        sys.exit("Нет me/profile.yaml. Запусти в Claude Code команду /onboard.")
+        sys.exit("no me/profile.yaml — run /setup")
     return yaml.safe_load(PROFILE.read_text(encoding="utf-8")) or {}
 
 
@@ -50,7 +46,7 @@ def get_json(url: str, **kw):
 
 
 def age_days(value) -> float | None:
-    """Возраст публикации в днях; принимает ISO-строку, секунды или миллисекунды."""
+    """Posting age in days; accepts ISO string, seconds or milliseconds."""
     if value in (None, ""):
         return None
     try:
@@ -74,7 +70,7 @@ def _rx(words: list[str]) -> re.Pattern | None:
 
 
 class Gates:
-    """Фильтры из профиля. Решают «стоит ли открывать», а не «подаваться ли»."""
+    """Filters from the profile. They decide "worth opening", not "apply"."""
 
     def __init__(self, profile: dict):
         s = profile.get("search", {}) or {}
@@ -92,13 +88,12 @@ class Gates:
         return bool(self.title_ok.search(title or "")) if self.title_ok else True
 
     def geo(self, location: str) -> str:
-        """wide — подходит; blocked — точно мимо; check — открыть и прочитать."""
+        """wide = fits; blocked = definitely not; check = open and read."""
         loc = location or ""
         oks = {m.group(0).lower() for m in self.geo_ok.finditer(loc)} if self.geo_ok else set()
         bad = bool(self.geo_bad and self.geo_bad.search(loc))
-        # «Remote» — слабый сигнал: «Remote - US» и «New York (Remote)» — это США.
-        # Стоп-регион перебивает голое «remote»; перебить его может только сильное
-        # слово («Europe», «EMEA», «worldwide»), и тогда — открыть и прочитать.
+        # "Remote" is weak: "Remote - US" and "New York (Remote)" are the US. A blocked region
+        # beats bare "remote"; only a strong word ("Europe", "EMEA", "worldwide") makes it "check".
         strong = oks - {"remote", "hybrid", "remote-first"}
         if bad:
             return "check" if strong else "blocked"

@@ -1,88 +1,49 @@
-# CV — как писать и тейлорить
+# CV — writing and tailoring
 
-Источники: факты — `me/experience-bank.md`; рамка — `me/positioning.md`; данные — `me/cv/base.yaml`.
+Facts: `me/experience-bank.md`. Framing: `me/positioning.md`. Data: `me/cv/base.yaml`. Renderer: `jk cv`.
 
-## 1. Формат
+## Format
+One page (< ~10 yrs experience), reverse-chronological, DOCX (PDF if the form/messenger needs it).
+Blocks: name · contact line (title · city · phone · email · links) · Summary · Experience
+(company — descriptor · location; title · dates; 2–4 bullets) · Projects (if it strengthens) ·
+Skills (3–5 groups, each skill once) · Education (unfinished = "coursework") · languages/work rights if relevant.
 
-Одна страница (опыт до ~10 лет), обратная хронология, DOCX — родной формат; PDF — если
-форма просит или для Telegram/почты. Рисует `scripts/render_cv.py`.
+## Bullets
+1. First bullet = strongest business outcome, not an activity.
+2. Result → how → tools; number first.
+3. Every number has a baseline ("+40% vs manual process").
+4. ≤4 per role, ≤2 lines each; unclear in one read → cut.
+5. Show user work explicitly (interviews, feedback loops).
+6. Outcome over effort ("turned X into Y", not "responsible for X"). No adjectives.
 
-| Блок | Что |
-|---|---|
-| Имя | крупно |
-| Строка контактов | тайтл · город · телефон · email · LinkedIn · портфолио (ссылки кликабельные) |
-| Summary | 3–4 предложения |
-| Experience | роль: компания — что за компания · город/формат; тайтл · даты; 2–4 буллета |
-| Projects | только если усиливает (пет-проекты для джуна, публичные кейсы) |
-| Skills | 3–5 групп, навык только в одной группе |
-| Education | вуз — степень — годы; незаконченное — честно («coursework») |
-| Языки, право работы | одной строкой, если важно для вакансии |
+## Summary
+About own experience, never "you/your". Answers the role's main need with proven experience. Each
+strength tied to where it was proven. No filler (languages, "team player") unless the JD asks.
+3–4 sentences, ≤ ~80 words. `jk audit --kind summary`.
 
-## 2. Буллеты
+## Skills
+Lead with the group the role values. Drop level-obvious items (Agile, Scrum, MS Office).
 
-1. **Первый буллет — самый сильный бизнес-результат**, а не активность. «Провёл аудит» — слабо;
-   «Снизил отток на 12 п.п.» — сильно.
-2. **Результат → как → чем.** Цифра первой, потом действие, потом инструмент.
-3. **У цифры есть база.** «+40% vs ручной процесс», «конверсия 3% = 2× от среднего по рынку».
-   Голый процент без «по сравнению с чем» слабее.
-4. **≤ 4 буллета на роль, ≤ 2 строки каждый.** Не очевиден результат с одного прочтения — режь.
-5. **Работа с пользователями — явно:** интервью, обратная связь, исследования.
-6. **Результат > усилие:** «превратил X в Y», а не «отвечал за X». Без прилагательных.
-
-## 3. Summary
-
-1. **О своём опыте, не к работодателю.** Никаких «You need…», «Your team…».
-2. Отвечает на главную боль вакансии — опытом, который её закрывает.
-3. Каждая заявленная сильная сторона привязана к месту, где она доказана.
-4. Без воды: языки, «коммуникабельный», «ответственный» — только если JD требует явно.
-5. 3–4 предложения, до ~80 слов. Проверка: `text_audit.py --kind summary`.
-
-## 4. Skills
-
-3–5 групп, ведущая — та, что ценит вакансия. Убрать очевидное для уровня (Agile, Scrum, MS Office,
-«communication»). Оставить то, что отличает или требует реального опыта.
-
-## 5. Тейлоринг под вакансию — что меняется
-
-Тело (компании, даты, цифры) стабильно. Меняется:
-1. **Тайтл** — уровень и домен вакансии в пределах трека (`me/positioning.md`).
-2. **Summary** — шаблон трека + 3–5 ключевых слов из JD (дословно, ATS-фильтры ищут слова).
-3. **Порядок и выбор буллетов** — самые релевантные вакансии первыми.
-4. **Порядок групп навыков** и навыки из JD, которые правда есть, — вперёд.
-5. Тайтл роли в прошлой компании — только из `title_options` (render_cv.py не даст другой).
-
-Процесс:
+## Tailoring per vacancy — what changes
+Title (level/domain within the track) · summary (track template + 3–5 exact JD keywords) · bullet
+selection/order · skill group order · past-job title only from `title_options` (renderer enforces).
 ```
-mkdir -p data/applications/<id>
-# 1) data/applications/<id>/jd.md — текст вакансии (копия, вакансии исчезают)
-# 2) data/applications/<id>/cv.yaml — overlay:
+data/applications/<id>/jd.md      # copy of the posting (they disappear)
+data/applications/<id>/cv.yaml    # overlay:
 title: "Product Manager · Growth"
 summary: >
   ...
-experience:
-  "Company A": [2, 0, 1]
+experience: {"Company A": [2, 0, 1]}
 skills_order: ["Growth & Analytics", "Product", "Tools"]
 file_name: "Name Surname CV"
-# 3) проверка и рендер
-python3 scripts/text_audit.py --kind summary --text "<summary>"
-python3 scripts/render_cv.py data/applications/<id>/cv.yaml --pdf
 ```
+`jk audit --kind summary --text "…"` → `jk cv data/applications/<id>/cv.yaml [--pdf]`.
+File name human-readable ("Name Surname CV"), never "cv_final_v3".
 
-`file_name` — человеческое: «Имя Фамилия CV» (рекрутёр видит имя файла). Не «cv_final_v3».
+## ATS readability
+No tables/columns/icons in content (renderer keeps it plain), standard headings, one date format
+("Mar 2023 – Present"), JD keywords in text when true.
 
-## 6. ATS-читаемость
-
-- Без таблиц, колонок, картинок, иконок в тексте — парсеры их ломают. render_cv.py рисует просто.
-- Стандартные заголовки (Summary, Experience, Skills, Education).
-- Даты одним форматом: «Mar 2023 – Present».
-- Ключевые слова вакансии — в тексте, если правда.
-
-## 7. Чек-лист перед загрузкой
-
-- [ ] Одна страница (render_cv.py предупреждает о длине)
-- [ ] Тайтл и summary под вакансию; summary без «you»
-- [ ] Ни одной цифры вне банка (`text_audit.py`)
-- [ ] Ни одного `banned_claims`
-- [ ] Контакты актуальны, ссылки работают
-- [ ] Имя файла человеческое
-- [ ] Открыть DOCX/PDF и посмотреть глазами
+## Before upload
+one page (renderer warns) · title/summary tailored, no "you" · `jk audit` clean · no banned claims ·
+links work · human file name · open the file and look.

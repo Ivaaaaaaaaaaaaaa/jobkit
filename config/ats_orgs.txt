@@ -1,23 +1,9 @@
-# Борды компаний, которые обходит scripts/scan.py (источник «ats»).
-#
-# Это стартовый список: ~300 продуктовых, AI- и remote-first компаний Европы, все слаги
-# проверялись живым запросом в сентябре–октябре 2026. Он отражает чужую нишу — под себя
-# его надо чистить и пополнять (как — playbooks/job-sources.md, раздел «Борды компаний»).
-#
-# Формат: <движок> <slug>, комментарий после #. Движки: ashby | greenhouse | lever | workable | recruitee.
-# Slug — имя компании в публичном адресе борда:
-#   ashby      https://jobs.ashbyhq.com/<slug>
-#   greenhouse https://job-boards.greenhouse.io/<slug>
-#   lever      https://jobs.lever.co/<slug>
-#   workable   https://apply.workable.com/<slug>
-#   recruitee  https://<slug>.recruitee.com
-#
-# Проверить новый slug перед добавлением (пустой ответ или 404 — slug неверный):
-#   curl -s https://api.ashbyhq.com/posting-api/job-board/<slug> | head -c 200
-#   curl -s https://boards-api.greenhouse.io/v1/boards/<slug>/jobs | head -c 200
-#   curl -s "https://api.lever.co/v0/postings/<slug>?mode=json" | head -c 200
-#
-# Свои компании — дописывай в конец, в раздел «мои».
+# Seed list of company ATS boards (~300 product / AI / remote-first companies, EU-leaning; slugs
+# verified Sep–Oct 2026). `jk boards` fits it to each user's profile and geo -> me/boards.txt.
+# Format: <engine> <slug>. Engines: ashby | greenhouse | lever | workable | recruitee.
+# Verify a slug: curl -s https://api.ashbyhq.com/posting-api/job-board/<slug> | head -c 200
+#                curl -s https://boards-api.greenhouse.io/v1/boards/<slug>/jobs | head -c 200
+#                curl -s "https://api.lever.co/v0/postings/<slug>?mode=json" | head -c 200
 
 ashby linear
 ashby supabase
@@ -319,5 +305,3 @@ greenhouse cresta
 ashby irissoftwaregroup
 ashby fyxer
 ashby plancraft
-
-# ── мои ──────────────────────────────────────────────

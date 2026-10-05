@@ -1,0 +1,6 @@
+{
+  "provider": "posthog",
+  "host": "https://eu.i.posthog.com",
+  "key": "",
+  "issues_repo": ""
+}

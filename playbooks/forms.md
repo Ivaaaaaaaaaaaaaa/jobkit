@@ -1,115 +1,65 @@
-# Заполнение форм — механика и ловушки
+# Forms — mechanics and engine traps
 
-Общие правила — `CLAUDE.md` §6. Здесь — как это делать руками агента и чем движки отличаются.
-Нашёл движок, где инструмент рапортует «успех», а поле пустое, — допиши сюда раздел.
+Found an engine where the tool reports success but the field is empty → add a section here.
 
-## 0. Браузер
+## 0. Browser
+Load once per batch:
+`ToolSearch select:mcp__claude-in-chrome__tabs_context_mcp,mcp__claude-in-chrome__tabs_create_mcp,mcp__claude-in-chrome__navigate,mcp__claude-in-chrome__read_page,mcp__claude-in-chrome__find,mcp__claude-in-chrome__form_input,mcp__claude-in-chrome__computer,mcp__claude-in-chrome__file_upload,mcp__claude-in-chrome__javascript_tool`
+No `file_upload` → don't start (can't attach CV). A built-in browser without the user's logins/file_upload
+is fine for reading postings, not for forms.
 
-Формы заполняются в Chrome кандидата через расширение Claude in Chrome. Инструменты deferred —
-поднять одним вызовом в начале батча:
+## 1. One role
+1. `tabs_create_mcp` → `navigate` to the form. One role = one tab.
+2. Map the form (`read_page`/`find`). Answer key yes/no fields (work rights, contractor), map AGAIN —
+   conditional fields render only after answers.
+3. CV first if the engine re-renders after upload (Ashby, Rippling).
+4. Fields in order; after each read the value via JS (`document.querySelector('[name="…"]').value`).
+5. Free text from answers.md (audited).
+6. Consent boxes of the application itself (GDPR/privacy) — tick. Cookie banner — reject non-essential.
+   Marketing opt-ins — no.
+7. `jk formcheck` → paste into `javascript_tool` → result in the report.
+8. Leave the tab on the final screen.
 
-```
-ToolSearch select:mcp__claude-in-chrome__tabs_context_mcp,mcp__claude-in-chrome__tabs_create_mcp,mcp__claude-in-chrome__navigate,mcp__claude-in-chrome__read_page,mcp__claude-in-chrome__find,mcp__claude-in-chrome__form_input,mcp__claude-in-chrome__computer,mcp__claude-in-chrome__file_upload,mcp__claude-in-chrome__javascript_tool
-```
+## 2. Typing traps
+- Background tab loses keystrokes, yet `computer type` says "Typed". Make the tab active; check
+  `document.visibilityState === 'visible'`.
+- JS `el.focus()` doesn't deliver typing — focus by clicking.
+- Long text → `form_input` by ref (`type` drops ~1 char per 40–60). Verify by reading `value`.
+- Typing into a filled field appends → `cmd+a`, `Delete` first.
+- Ten `type` calls in a row lose values silently — one field, then read.
+- Reading tools work on background tabs.
 
-Не поднялся `file_upload` — подачу не начинать: без него CV не приложить.
-Встроенный браузер Claude (если есть) — без логинов кандидата и без `file_upload`; для форм не годится,
-для чтения вакансий — годится.
+## 3. CV upload
+JS-click the upload button (creates hidden `input[type=file]`) → `find` "file" → `file_upload` with
+tabId, ref, ABSOLUTE path. Proof: file name visible. ~10 MB limit. PDF asked → `jk cv … --pdf`.
 
-## 1. Порядок на одну роль
+## 4. Engines
+- **Greenhouse:** text via `form_input`; React dropdowns need click → type → pick. City: pick the
+  autocomplete suggestion. School: directory search; not listed → "Other". reCAPTCHA often → stop.
+  formcheck accurate. No drafts.
+- **Ashby:** CV first (refs shift after upload). `form_input`/ref clicks often "succeed" without
+  reaching form state → coordinate click + real typing, read value each time. Yes/No toggles are
+  `button[aria-pressed]` (formcheck can't see them). Final proof = Submit response (lists missing
+  fields); one re-fill pass is normal — warn the candidate in confirm_each mode. No drafts.
+- **Lever:** simple one page, `form_input` works; form at `…/apply`.
+- **Workable:** multi-step; go to the last step.
+- **Teamtailor:** second application to the same company → email verification link
+  (`…/email_verification_needed`); the candidate (or agent with mailbox access) opens it.
+- **Recruitee, Personio, SmartRecruiters, BambooHR:** ordinary; BambooHR may have captcha.
+- **Rippling:** CV first, it pre-fills contacts. formcheck false-green → verify by JS dump. Upload
+  proof: "File … uploaded successfully".
+- **iframe forms (Comeet etc.):** click Apply, take the frame `src`, `location.href = src`.
+- **Workday, SuccessFactors, Taleo, iCIMS with sign-up:** account required → stop, report.
+- **LinkedIn Easy Apply** (candidate's Chrome): modal may need a second click after 6–8 s; refs often
+  fail inside → coordinates, note it. Long text via `form_input` by ref. Dates only via the picker.
+  Upload the tailored CV, not a saved generic one. Drafts exist (X → Save).
 
-1. `tabs_create_mcp` → новая вкладка → `navigate` на форму. Одна роль — одна вкладка.
-2. Снять схему формы (`read_page` / `find`). Ответить на ключевые да/нет (право работы,
-   контракт) и снять схему **ещё раз** — условные поля появляются только после ответа.
-3. Резюме первым, если движок перерисовывает форму после загрузки (Ashby, Rippling).
-4. Поля по порядку, после каждого — JS-чтение значения:
-   `document.querySelector('[name="..."]').value`.
-5. Свободные ответы — из `data/applications/<id>/answers.md`, прошедшие `text_audit.py`.
-6. Чекбоксы согласия на обработку данных **самой заявки** (GDPR, privacy notice) — ставит агент.
-   Куки-баннер сайта — вариант с отказом от необязательных. Согласие на маркетинговые рассылки — нет.
-7. `scripts/form_check.js` через `javascript_tool` → результат в отчёт.
-8. Вкладку оставить открытой на последнем экране перед отправкой.
+## 5. Workaround ladder (record failed steps before giving up)
+ref path → coordinates where ref fails → iframe `src` in own tab → login wall: public board JSON
+(`api.ashbyhq.com/posting-api/job-board/<org>`, `boards-api.greenhouse.io/v1/boards/<org>/jobs`,
+`api.lever.co/v0/postings/<org>?mode=json`) or company careers page → dead link: find it on the
+company site. Beyond that only the five stops.
 
-## 2. Ввод текста — ловушки инструментов
-
-- **Фоновая вкладка теряет клавиатуру.** `computer type` уходит в активную вкладку окна, а не в
-  ту, чей `tabId` передан, и всё равно отвечает «Typed». Перед печатью — сделать вкладку активной
-  и проверить `document.visibilityState === 'visible'`.
-- **`el.focus()` из JS ставит фокус, но текст не доставляет.** Фокус — кликом по полю.
-- **Длинный текст — только `form_input` по ref.** `computer type` роняет примерно символ на
-  40–60 знаков. Сверять результат чтением `value`: на скриншоте пропуск буквы не виден.
-- **Ввод в непустое поле дописывает к старому** — перед повтором `cmd+a` и `Delete`.
-- **Пачка из десяти `type` подряд теряет значения молча** — одно поле, потом чтение.
-- Чтение (`read_page`, `find`, `javascript_tool`, `file_upload`) на фоновой вкладке работает.
-
-## 3. Загрузка CV
-
-1. JS-клик по кнопке «Attach / Upload resume» — создаёт скрытый `input[type=file]`.
-2. `find` по запросу «file» → `ref`.
-3. `file_upload` с `tabId`, `ref` и **абсолютным путём** к файлу в `data/applications/<id>/`.
-4. Доказательство — имя файла на форме. Лимит ~10 МБ.
-
-Форма просит PDF — `render_cv.py ... --pdf`.
-
-## 4. Движки ATS
-
-**Greenhouse** — форма под текстом вакансии. Текстовые поля берут `form_input`; выпадающие списки
-(React combobox) — нет: клик, ввод, выбор пункта. Город — кликнуть подсказку автокомплита, голый
-текст не проходит. Поле School — поиск по справочнику; вуза нет → пункт «Other». Часто reCAPTCHA
-перед отправкой — это стоп, жмёт кандидат. `form_check.js` здесь точен. Черновиков нет.
-
-**Ashby** — самый капризный.
-- Резюме первым: после загрузки форма перерисовывается, старые `ref` бьют мимо.
-- `form_input` и клики по `ref` часто «успешны», но до состояния формы значение не доходит.
-  Надёжно: координатный клик по полю + `type` с клавиатуры, чтение `value` после каждого.
-- Да/нет-тумблеры — `button[aria-pressed]`, `form_check.js` их не видит (ложный минус).
-- Окончательное доказательство — ответ формы на Submit: отклоняя, Ashby перечисляет пустые
-  поля. Один повторный проход по названным полям — норма. В режиме `confirm_each` предупредить
-  кандидата, что после его клика может понадобиться дозаполнение.
-- Черновиков нет.
-
-**Lever** — простая одностраничная форма, `form_input` работает. Ссылка на форму — `…/apply`.
-
-**Workable** — многошаговый мастер; бывает обязательный вопрос с файлом; доходить до последнего шага.
-
-**Teamtailor** — повторная заявка в ту же компанию требует подтверждения по ссылке из письма
-(адрес `…/email_verification_needed`). Ссылку открывает кандидат из своей почты — или агент,
-если у него есть доступ к ящику заявок (см. `playbooks/data-storage.md` → почта).
-
-**Recruitee, Personio, SmartRecruiters, BambooHR** — обычные формы; у BambooHR бывает капча.
-
-**Rippling** — резюме первым, форма сама заполнит контакты. `form_check.js` даёт ложный зелёный —
-проверять JS-дампом полей. Доказательство загрузки — текст «File … uploaded successfully».
-
-**Comeet и другие в iframe** — нажать Apply, взять `src` фрейма и открыть его своей вкладкой
-(`location.href = src`) — форма становится обычной.
-
-**Workday, SuccessFactors, Taleo, iCIMS с регистрацией** — нужен аккаунт: это стоп. Роль в отчёт
-«нужен аккаунт», решает кандидат (может завести сам и дать агенту продолжить после входа).
-
-**LinkedIn Easy Apply** — в залогиненном Chrome кандидата.
-- Модалка открывается не с первого клика: клик → пауза 6–8 с → повтор.
-- В модалке `ref` часто не работает — координатные клики, с пометкой в отчёте.
-- Длинный текст — `form_input` по ref (здесь работает), сверка `value`.
-- Поле даты — только штатный date-picker.
-- Резюме — загружать своё под роль, не выбирать сохранённое generic.
-- Черновик есть: закрыть X → «Сохранить».
-
-## 5. Лестница обходов
-
-Прежде чем объявить форму непроходимой, пройти и записать, какие ступени провалились:
-1. Обычный путь по `ref` → координатный клик там, где ref не работает.
-2. Форма в iframe → открыть `src` фрейма своей вкладкой.
-3. Login-wall на агрегаторе → публичный борд компании:
-   `api.ashbyhq.com/posting-api/job-board/<org>`, `boards-api.greenhouse.io/v1/boards/<org>/jobs`,
-   `api.lever.co/v0/postings/<org>?mode=json`, карьерная страница компании.
-4. Ссылка мёртвая → найти вакансию на сайте компании поиском.
-Дальше — только пять стопов из `CLAUDE.md` §2.2.
-
-## 6. Готовность и отчёт
-
-Роль готова, когда: все шаги мастера пройдены; CV приложен, имя файла видно; `form_check.js`
-годен (на Ashby — оговорка выше); вкладка жива в `tabs_context_mcp`.
-
-После подтверждения и отправки — проверить экран «Thank you / Application received», закрыть
-вкладку (по одной, не параллельно), `tracker.py set <id> applied`.
+## 6. Ready and after
+Ready: all wizard steps done, CV attached and visible, formcheck OK (Ashby caveat), tab alive.
+After sending: "thank you" screen, close tabs one by one, `jk t set <id> applied`.

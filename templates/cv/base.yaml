@@ -1,39 +1,37 @@
-# Данные резюме. Из них scripts/render_cv.py рисует DOCX/PDF.
-# Здесь ВСЁ: все роли, все буллеты (даже лишние), все навыки. Под вакансию отбираем
-# overlay-файлом (data/applications/<id>/cv.yaml), сюда не лезем.
-# Факты — только из me/experience-bank.md.
+# CV data. `jk cv` renders DOCX/PDF from it. Everything here: all roles, all bullets, all skills.
+# Per vacancy select via an overlay (data/applications/<id>/cv.yaml). Facts only from the bank.
 
 header:
   name: "TODO Name Surname"
   location: "TODO City, Country"
   phone: "TODO +0 000 000 0000"
   email: "TODO name@example.com"
-  links:                                   # имя ссылки: адрес
+  links:                                   # label: url
     LinkedIn: "https://www.linkedin.com/in/TODO"
     # Portfolio: "https://..."
 
-title: "TODO Product Manager"              # строка под именем по умолчанию
-page: "A4"                                 # A4 — Европа и почти весь мир; Letter — США
+title: "TODO Product Manager"              # line under the name
+page: "A4"                                 # A4 or Letter (US)
 
 summary: >
-  TODO 3–4 предложения о своём опыте (не обращаясь к работодателю): кто ты, лучший результат
-  с цифрой, что умеешь лучше других, в каких продуктах.
+  TODO 3–4 sentences about own experience (never "you"): who you are, best result
+  with a number, your edge, which products.
 
 experience:
   - company: "TODO Company"
-    descriptor: "TODO что за компания, одной строкой"
+    descriptor: "TODO what the company is, one line"
     location: "TODO City / Remote"
     role: "TODO Product Manager"
-    title_options: []                      # честные альтернативные тайтлы этой же роли
+    title_options: []                      # honest alternative titles of this role
     dates: "TODO Mon YYYY – Present"
-    bullets:                               # результат с цифрой → как → чем; ≤ 2 строк
+    bullets:                               # result with number → how → tools; ≤ 2 lines
       - "TODO Increased X by N% (vs baseline) by doing Y, using Z"
       - "TODO"
       - "TODO"
 
 projects: []                               # - name: "..."  text: "..."  url: "..."
 
-skills:                                    # 3–5 групп, навык только в одной группе
+skills:                                    # 3–5 groups, each skill once
   - group: "Product"
     items: ["TODO"]
   - group: "Data & Analytics"
@@ -47,4 +45,4 @@ education:
     dates: "TODO YYYY–YYYY"
 
 languages: "TODO Languages: English (C1), Russian (native)"
-work_authorization: ""                     # напр. "Eligible to work in the EU" — только если правда
+work_authorization: ""                     # e.g. "Eligible to work in the EU" — only if true

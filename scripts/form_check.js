@@ -1,22 +1,9 @@
-// Тест готовности формы: какие ОБЯЗАТЕЛЬНЫЕ поля ещё пусты.
-//
-// Зачем. Отчёт браузерного инструмента — не доказательство: form_input на react-select
-// отвечает «успех» и не сохраняет значение, загрузка файла может «пройти» в несуществующее
-// поле. Доказательство — этот прогон.
-//
-// Как гонять: javascript_tool на вкладке с формой, вставив тело файла целиком.
-// Возвращает {required, empty_count, empty:[...]}.
-// Форма готова, только когда empty пуст или содержит ровно те поля, которые сознательно
-// оставлены человеку, — и каждое названо в отчёте.
-//
-// Граница теста: он читает DOM. На Ashby этого мало (значение может не дойти до состояния
-// формы) — там окончательная проверка — ответ формы на Submit; на Rippling тест даёт ложный
-// зелёный. Подробно — playbooks/forms.md.
-//
-// Обязательное поле опознаётся тремя способами: звёздочка в подписи (Greenhouse), класс
-// с «required» на подписи (Ashby рисует звёздочку через CSS), атрибут required/aria-required.
-// У react-select видимый input после выбора пустеет — поэтому смотрим ещё singleValue
-// и имя приложенного файла.
+// Form readiness test: which REQUIRED fields are still empty. Run via javascript_tool on the form tab.
+// Returns {required, empty_count, empty:[labels]}. Ready = empty_count 0, or only fields deliberately
+// left to the candidate and named in the report. Tool "success" reports are not proof; this is.
+// Reads the DOM: on Ashby the final proof is the Submit response; on Rippling it can be false-green.
+// Required = asterisk in label (Greenhouse), "required" class on label (Ashby CSS asterisk), or
+// required/aria-required attribute. react-select empties its input after a pick → also check singleValue.
 
 (() => {
   const clean = s => (s || '').replace(/\s+/g, ' ').trim();
@@ -47,7 +34,7 @@
       '[class*="singleValue"],[class*="single-value"],[class*="multiValue"],[class*="multi-value"]'
     );
     if (sv && clean(sv.textContent)) return true;
-    if (/\.(pdf|docx?|txt|rtf)\b/i.test(box.textContent)) return true;   // приложенный файл
+    if (/\.(pdf|docx?|txt|rtf)\b/i.test(box.textContent)) return true;   // attached file
     return false;
   };
 

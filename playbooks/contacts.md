@@ -1,58 +1,42 @@
-# Контакт вместо формы, follow-up, нетворкинг
+# Contact instead of a form, follow-ups, networking
 
-Граница та же, что у формы: сообщение от имени кандидата отправляет кандидат. Агент готовит
-комплект так, чтобы кандидату осталось одно действие. Исключение — `autonomy.send_messages: true`
-и прямая просьба кандидата про конкретные сообщения в этой сессии.
+Messages as the candidate are sent by the candidate; the agent prepares everything so one action
+remains (exception: `autonomy.send_messages: true` + explicit request for those messages).
 
-## 1. Сначала ищем настоящую форму
+## 1. Look for a real form first
+Company careers/ATS → same role with a form? Then it's a normal application; the message is extra.
+Hiring manager's LinkedIn → recent posts → job link.
 
-Рекрутёр в посте или Telegram часто ведёт на вакансию, у которой есть обычная форма.
-1. Название компании → её Careers / борд ATS → та же роль? Есть форма — это обычная подача,
-   сообщение становится дополнением.
-2. Профиль нанимающего в LinkedIn → его недавние посты → ссылка на вакансию.
-
-## 2. Комплект для Telegram (ровно четыре вещи, в этом порядке)
-
-1. **Кликабельная ссылка на человека:** `https://t.me/<handle>` (не «@handle»).
-2. **Ссылка на вакансию.**
-3. **CV под роль** — PDF: путь и сам файл (выделить в Finder: `open -R <путь>`), чтобы приложить
-   одним перетаскиванием.
-4. **Сообщение 5–7 строк:**
-   ```
-   Привет! Подаюсь на вакансию <роль> — <ссылка>.
-   Сейчас <роль> в <компания>: <один результат с цифрой>.
-   <Одна строка, закрывающая главное требование вакансии>.
-   Резюме прикладываю, буду рад(а) созвониться.
-   <Имя>, <телефон>
-   ```
-Длинное письмо в личке никто не читает.
+## 2. Telegram kit (exactly four things, in order)
+1. Clickable link to the person: `https://t.me/<handle>`.
+2. Vacancy link.
+3. Tailored CV as PDF: path + reveal the file (`open -R <path>`) for one drag.
+4. Message, 5–7 lines (in the vacancy's language):
+```
+Hi! Applying for <role> — <link>.
+Currently <role> at <company>: <one result with a number>.
+<One line covering the role's main requirement>.
+CV attached, happy to have a call.
+<Name>, <phone>
+```
 
 ## 3. LinkedIn
+Message to recruiter/hiring manager: 3–5 lines, same skeleton, CV attached. Invitation note
+(≤200 chars): "Hi <name>, applied for <role> at <company> — <one number about you>. Would love to
+connect." Free personalized invites are scarce — spend on hiring managers. No Premium without the candidate.
 
-- **Сообщение нанимающему / рекрутёру** — 3–5 строк, тот же каркас, CV файлом.
-- **Приглашение с запиской** (до 200 символов): «Hi <имя>, applied for <роль> at <компания> —
-  <одна цифра про себя>. Would love to connect.» Бесплатных персональных приглашений мало —
-  тратить на нанимающих менеджеров.
-- Premium не покупаем без решения кандидата.
+## 4. Email
+Subject "<Role> — <Name>"; 5–8 lines; CV attached. Draft in the candidate's mailbox (if connected) or as text.
 
-## 4. Почта рекрутёру
-
-Тема: «<Роль> — <Имя>». Тело — как сообщение, 5–8 строк, CV приложением. Черновик — в почте
-кандидата (если есть доступ) или текстом в чат.
-
-## 5. Follow-up
-
-| Когда | Что |
+## 5. Follow-ups
+| When | What |
 |---|---|
-| Через 7 дней тишины после подачи | Короткое сообщение рекрутёру/нанимающему в LinkedIn: подал(а), одна цифра, вопрос о статусе |
-| На следующий день после интервью | Спасибо + одна мысль из разговора + что ещё можешь показать |
-| После отказа | Спасибо, просьба о фидбеке (одно предложение), желание остаться на связи |
-| Обещали ответ к дате, дата прошла | Вежливо уточнить через 2 рабочих дня |
+| 7 days of silence after applying | short LinkedIn note: applied, one number, status? |
+| day after an interview | thanks + one idea from the talk + what else you can show |
+| after rejection | thanks, one-line feedback request, stay in touch |
+| promised date passed | polite check after 2 working days |
+`jk t due` lists them; afterwards `jk t set <id> <status> "follow-up sent" --next … --date …`.
 
-`tracker.py due` показывает, кому пора. После follow-up — `tracker.py set <id> <статус> "follow-up отправлен" --next "..." --date ...`.
-
-## 6. Рефералы
-
-Реферал конвертит в разы лучше холодной подачи. Раз в неделю спрашивать кандидата: есть ли
-знакомые в компаниях из очереди? Для каждого — черновик просьбы: что за роль, ссылка, почему
-подходишь (2 строки), CV.
+## 6. Referrals
+Convert far better than cold. Weekly: "anyone you know at companies in the queue?" Draft per contact:
+role, link, why you fit (2 lines), CV.

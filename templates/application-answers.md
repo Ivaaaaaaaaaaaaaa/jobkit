@@ -1,82 +1,58 @@
-<!--
-APPLICATION ANSWERS — канон ответов на типовые поля анкет.
-Правило файла: любой факт, который пришлось спросить во время подачи, дописывается сюда
-в тот же заход. Второй раз тот же вопрос — дефект агента.
-Здесь — единственное место для этих ответов: в профиле и других файлах их не дублируем
-(иначе цифры расходятся).
--->
+<!-- APPLICATION ANSWERS — canonical answers to form fields. Any question asked during an
+application is appended to §5 the same session; asking twice is a defect. Not duplicated elsewhere. -->
+# Application answers — TODO name
 
-# Ответы анкеты — TODO имя
-
-## 1. Личные поля
-
-| Поле | Ответ |
+## 1. Personal
+| Field | Answer |
 |---|---|
-| Имя (латиницей) | TODO |
+| Name | TODO |
 | Email | TODO |
-| Телефон | TODO (если поле кода страны отдельно: код TODO, номер TODO) |
-| Город, страна | TODO |
-| Адрес / индекс (если обязателен) | TODO |
+| Phone | TODO (separate country code field: TODO / TODO) |
+| City, country | TODO |
+| Address / postcode (if required) | TODO |
 | LinkedIn | TODO |
-| Портфолио / сайт | TODO |
-| Предпочтительный формат | TODO (remote / hybrid / office) |
-| Готовность к переезду | TODO |
-| Срок выхода (notice period) | TODO (напр. «Two weeks from offer»; календарь — дата через 3–4 недели) |
-| Языки | TODO |
-| Лет опыта в профессии | TODO |
-| Текущая занятость | TODO (работаю / нет; с какой даты) |
-| Гражданство | TODO |
+| Portfolio | TODO |
+| Preferred format | TODO |
+| Relocation | TODO |
+| Notice period | TODO (calendar-only field: a date 3–4 weeks out) |
+| Languages | TODO |
+| Years of experience | TODO |
+| Currently employed | TODO |
+| Citizenship | TODO |
 
-## 2. Право на работу — ответ зависит от страны вакансии
-
-| Вопрос | Вакансия в стране, где есть право работы / remote оттуда | Вакансия с переездом |
+## 2. Work authorization — depends on the vacancy's country
+| Question | Country where you can work / remote from it | Relocation role |
 |---|---|---|
-| Authorized / eligible to work in <country> | TODO (обычно Yes) | TODO (обычно No) |
-| Require visa sponsorship | TODO (обычно No) | TODO (обычно Yes) |
-| Ready to work as contractor / B2B | TODO | TODO |
+| Authorized to work in <country> | TODO | TODO |
+| Require visa sponsorship | TODO | TODO |
+| Contractor / B2B | TODO | TODO |
+Never carry one country's answer to another.
 
-Правило: галочку из одной страны на другую не переносим. Проверяем страну конкретной вакансии.
+## 3. Money
+- Base: TODO (year/month, gross/net). Target: TODO. Floor: TODO (band minimum below → skip).
+Rules: published band → its upper part (number field = their max; text = "mid – max"); band minimum
+below floor → don't apply. No band → tier below (several fit → highest). Month↔year ×12 (×13 if a
+13th salary is mentioned); other currency at today's rate. A field placeholder ("E.g. 2750") is not a band.
 
-## 3. Деньги
-
-- **Валюта и база:** TODO (год / месяц, gross / net — как ты сам(а) считаешь)
-- **Желаемое:** TODO
-- **Нижняя граница:** TODO — вилка вакансии ниже неё = не подаёмся
-
-**Порядок выбора цифры в анкете:**
-1. Вакансия публикует вилку → ставим её верхнюю часть (числовое поле — их максимум; текстовое —
-   «середина – максимум»). Нижняя граница их вилки ниже твоего порога — роль не заполняем.
-2. Вилки нет → ступень по типу вакансии (таблица). Подходит несколько — берём высшую.
-3. Месячное ↔ годовое: ×12 (×13, если вакансия упоминает 13-ю зарплату). Чужая валюта — по курсу.
-4. Пример в поле формы («E.g. 2750») — не вилка.
-
-| Ступень | Какие вакансии | Год, текстом | Год, числом | Месяц | Контракт, месяц |
+| Tier | Vacancies | Year, text | Year, number | Month | Contract, month |
 |---|---|---|---|---|---|
-| 1 — выше цели | TODO (крупные/хорошо финансированные, редкий навык, ступень выше) | TODO | TODO | TODO | TODO |
-| 2 — цель | TODO (типичная вакансия твоего уровня) | TODO | TODO | TODO | TODO |
-| 3 — ниже цели | TODO (локальный рынок, маленькие компании) | TODO | TODO | TODO | TODO |
+| 1 above target | TODO | TODO | TODO | TODO | TODO |
+| 2 target | TODO | TODO | TODO | TODO | TODO |
+| 3 below target | TODO | TODO | TODO | TODO | TODO |
+Current salary: required → same as the ask; optional → skip. Don't write "gross" unless asked.
 
-| Поле | Ответ |
+## 4. Frequent
+| Question | Answer |
 |---|---|
-| Текущая зарплата | Обязательное → то же ожидание, что для вакансии; необязательное → пропуск |
-| Слово «gross» в свободном поле | не пишем, если не спрашивают прямо |
+| How did you hear about us | where actually found; company board → "Company website"/"Other" |
+| Non-compete / NDA blocks you | TODO |
+| Education (School/Degree/Field/Years) | TODO |
+| Pronouns | optional → skip; required → TODO |
+| Demographics | skip; required → "I don't wish to answer" |
+| Interview recording consent | TODO |
+| Take-home test OK | TODO |
+| Travel | TODO |
 
-## 4. Частые вопросы
-
-| Вопрос | Ответ |
-|---|---|
-| How did you hear about us? | Где нашли на самом деле; нашли на их сайте/борде — «Company website» или «Other» |
-| Non-compete / NDA мешает? | TODO |
-| Образование (School / Degree / Field / Years) | TODO |
-| Pronouns (необязательное) | пропуск; обязательное — TODO |
-| Демография (race / gender / disability) | не заполняем; обязательное — «I don't wish to answer» |
-| Согласие на запись интервью | TODO |
-| Готовность к тестовому заданию | TODO |
-| Готовность к командировкам | TODO |
-
-## 5. Добавлено в ходе подач
-
-<!-- Сюда агент дописывает новые вопросы и твои ответы: | дата | вопрос | ответ | -->
-
-| Дата | Вопрос | Ответ |
+## 5. Added during applications
+| Date | Question | Answer |
 |---|---|---|

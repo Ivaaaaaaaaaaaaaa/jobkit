@@ -1,67 +1,42 @@
-<!--
-EXPERIENCE BANK — единственный источник фактов о тебе.
-Любое CV, письмо, ответ анкеты и сообщение рекрутёру берёт факты ОТСЮДА.
-Правила:
-  • Каждая цифра здесь — настоящая и подтверждена тобой. Модель может переформулировать,
-    но не может добавить цифру, которой здесь нет (scripts/text_audit.py это ловит).
-  • Оценка вместо точной цифры — можно, но с пометкой «≈» и с тем, как посчитано.
-  • Что НЕ можешь заявлять — раздел «Чего нет» внизу и profile.yaml -> banned_claims.
-  • Заполняет /cv-interview. Дописывай сюда сразу, как вспомнил новый факт.
--->
+<!-- EXPERIENCE BANK — the only source of facts. Every number is real and confirmed; "≈" = estimate
+with the method noted. `jk audit` rejects numbers not found here. Filled by /jobkit:cv-interview. -->
+# Experience bank — TODO name
+Updated: TODO
 
-# Experience bank — TODO имя
+## 1. In short
+- One line: TODO
+- Years in the profession: TODO (since when, what counts)
+- Top-3 strengths (each proven below): TODO
 
-Обновлено: TODO
+## 2. Jobs (newest first; copy the block per job)
+### TODO Company — TODO role
+- Dates: TODO – TODO · Format: TODO
+- Company: what, for whom, size, stage
+- Scope: product area, users
+- Team: who, how many, reporting to
+- Honest alternative titles: TODO
+- Achievements (result with number → how → tools):
+  1. TODO
+- Methods: TODO
+- Tools: TODO
+- Failure / lesson (interviews only): TODO
 
-## 1. Коротко обо мне (для саммари и «расскажите о себе»)
+## 3. Projects, courses
+- TODO
 
-- Кто я одной строкой: TODO
-- Лет в профессии: TODO (с какого года считаем и что входит)
-- Сильные стороны (3, каждая с доказательством ниже): TODO
+## 4. Education & certificates
+- TODO school — degree — field — years (finished / not)
 
-## 2. Опыт — по местам работы, от свежего к старому
+## 5. Languages
+- TODO
 
-<!-- Копируй блок на каждое место. Буллеты — по формуле «результат с цифрой → как → чем». -->
+## 6. STAR stories
+### TODO title
+`tags: … · job: …`
+- S: TODO
+- T: TODO
+- A: TODO
+- R: TODO
 
-### TODO Компания — TODO роль
-- **Даты:** TODO – TODO · **Формат:** TODO (офис / удалённо, город)
-- **Компания:** что делает, для кого, размер, стадия (одна строка)
-- **Продукт и зона:** за что отвечал(а), какая часть продукта, какие пользователи
-- **Команда:** с кем работал(а), сколько человек, кому подчинялся(лась)
-- **Альтернативные названия роли** (честные, отражают реальную работу): TODO
-- **Достижения:**
-  1. TODO результат с цифрой → что сделал(а) → инструменты
-  2. TODO
-  3. TODO
-- **Процессы и методы:** discovery, интервью, A/B, roadmap, метрики — что реально делал(а)
-- **Инструменты:** TODO
-- **Провал или урок** (для интервью, не для CV): TODO
-
-## 3. Проекты вне работы, учёба, курсы
-
-- TODO пет-проект / хакатон / курс — что сделал(а), ссылка, результат
-
-## 4. Образование и сертификаты
-
-- TODO вуз — степень — специальность — годы (закончен / не закончен — честно)
-
-## 5. Языки
-
-- TODO: уровень (A1–C2 / native)
-
-## 6. Истории для интервью (STAR)
-
-<!-- 5–8 историй: конфликт, провал, приоритизация, влияние без власти, решение на данных,
-запуск, работа с неясностью. Каждая — Situation / Task / Action / Result с цифрой. -->
-
-### TODO название истории
-`теги: приоритизация, данные` · `место: Компания`
-- **S:** TODO
-- **T:** TODO
-- **A:** TODO
-- **R:** TODO
-
-## 7. Чего нет (не писать нигде)
-
-- TODO навыки, домены, инструменты, тайтлы, которых не было. Пример: «не руководил(а) людьми
-  в подчинении», «SQL — только простые запросы».
+## 7. What I don't have (never claim)
+- TODO

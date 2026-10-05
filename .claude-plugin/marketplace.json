@@ -1,0 +1,15 @@
+{
+  "name": "jobkit",
+  "description": "jobkit \u2014 job search agent plugin for Claude Code",
+  "owner": {
+    "name": "TODO"
+  },
+  "plugins": [
+    {
+      "name": "jobkit",
+      "source": "./",
+      "version": "0.2.0",
+      "description": "Job search agent for Claude Code: setup from CV/LinkedIn, scan, tailored applications, tracker."
+    }
+  ]
+}

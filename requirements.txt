@@ -1,3 +1,5 @@
-pyyaml          # профиль и данные CV
-python-docx     # сборка резюме в DOCX
-# PDF: LibreOffice (brew install --cask libreoffice) или пакет docx2pdf при установленном Word
+# Installed automatically by `jk setup` into ~/.jobkit/venv — no manual pip needed.
+pyyaml        # profile and CV data
+python-docx   # CV rendering (DOCX) and DOCX import
+pypdf         # CV / LinkedIn PDF import
+# Optional: LibreOffice for PDF CVs (brew install --cask libreoffice)

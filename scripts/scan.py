@@ -1,28 +1,13 @@
 #!/usr/bin/env python3
-"""Поиск вакансий без браузера и без ключей: борды компаний (ATS) + открытые remote-доски.
+"""Job scan without browser or keys: company ATS boards + open remote boards.
 
-Что обходит (список включается в me/profile.yaml -> search.sources):
-    ats       — борды компаний из config/ats_orgs.txt (Ashby, Greenhouse, Lever, Workable,
-                Recruitee). Самый ценный источник: ссылка сразу ведёт на настоящую форму,
-                дата и гео — от самой компании.
-    jobicy    — jobicy.com, remote-вакансии с регионом.
-    remoteok  — remoteok.com.
-    remotive  — remotive.com.
+Sources (profile -> search.sources): ats (me/boards.txt, else config/ats_orgs.txt; Ashby, Greenhouse,
+Lever, Workable, Recruitee), jobicy, remoteok, remotive. Filters from the profile: titles, freshness,
+geo, skip_companies. Geo here is PRELIMINARY — verify on the company ATS before applying.
+Journal data/seen.json: a re-run shows only new jobs.
 
-Фильтры — из профиля: название роли (search.title_include / title_exclude), свежесть
-(search.max_age_days), гео (geo.ok_keywords / block_keywords), компании-исключения.
-Гео здесь ПРЕДВАРИТЕЛЬНОЕ: «Remote» на доске часто значит одну страну. Перед подачей
-текст вакансии и форму всё равно читаем на сайте компании (CLAUDE.md -> «Отбор»).
-
-Журнал data/seen.json: повторный прогон показывает только новое.
-
-Запуск:
-    python scripts/scan.py                 # новое с прошлого раза
-    python scripts/scan.py --all           # весь свежий срез, без журнала
-    python scripts/scan.py --days 7        # своё окно свежести
-    python scripts/scan.py --only ats      # один источник
-    python scripts/scan.py --to-tracker    # записать новое в трекер статусом found
-Результат: data/scan_latest.json + таблица в консоли.
+    jk scan [--all] [--days N] [--only ats] [--to-tracker] [--top N]
+Full result: data/scan_latest.json; console shows the top N compactly.
 """
 from __future__ import annotations
 
@@ -36,13 +21,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 import kit  # noqa: E402
 
-ORGS = kit.ROOT / "config" / "ats_orgs.txt"
+ORGS = kit.ME / "boards.txt" if (kit.ME / "boards.txt").exists() else kit.FRAMEWORK / "config" / "ats_orgs.txt"
 SEEN = kit.DATA / "seen.json"
 OUT = kit.DATA / "scan_latest.json"
 ENGINES = ("ashby", "greenhouse", "lever", "workable", "recruitee")
 
 
-# ── источники: каждый отдаёт список {company, title, location, url, age_days, source} ──
+# ── sources: each returns [{company, title, location, url, age_days, source}] ──
 
 def load_orgs() -> list[tuple[str, str]]:
     out = []
@@ -54,7 +39,7 @@ def load_orgs() -> list[tuple[str, str]]:
         if len(parts) == 2 and parts[0] in ENGINES:
             out.append((parts[0], parts[1]))
         elif line:
-            print(f"  ! ats_orgs: пропускаю «{line}» — движок не из {ENGINES}", file=sys.stderr)
+            print(f"  ! boards: skip {line!r} — engine not in {ENGINES}", file=sys.stderr)
     return out
 
 
@@ -141,6 +126,7 @@ def main() -> int:
     ap.add_argument("--days", type=float)
     ap.add_argument("--only")
     ap.add_argument("--to-tracker", action="store_true")
+    ap.add_argument("--top", type=int, default=25)
     a = ap.parse_args()
 
     profile = kit.load_profile()
@@ -152,7 +138,7 @@ def main() -> int:
     raw, stats = [], {}
     for n in names:
         if n not in SOURCES:
-            print(f"  ! источник «{n}» неизвестен, есть: {', '.join(SOURCES)}")
+            print(f"  ! unknown source {n}; available: {', '.join(SOURCES)}")
             continue
         got = SOURCES[n](profile)
         stats[n] = len(got)
@@ -193,14 +179,18 @@ def main() -> int:
     kit.DATA.mkdir(exist_ok=True)
     SEEN.write_text(json.dumps(seen, ensure_ascii=False))
     OUT.write_text(json.dumps(out, ensure_ascii=False, indent=1))
+    from events import log
+    log("scan", sources=stats, dropped={k: v for k, v in dropped.items() if v}, new=len(out),
+        wide=sum(r["geo"] == "wide" for r in out))
 
-    print("Источники: " + ", ".join(f"{k} {v}" for k, v in stats.items()))
-    print("Отсеяно: " + ", ".join(f"{k} {v}" for k, v in dropped.items() if v))
-    print(f"\nНовых кандидатов: {len(out)}  (wide — гео подходит, check — открыть и прочитать)\n")
-    for r in out:
-        age = "?" if r["age_days"] is None else f"{r['age_days']:.0f}д"
-        print(f"{r['geo']:<5} {age:>4}  {r['company'][:22]:<22} {r['title'][:60]:<60} {r['location'][:30]}")
-        print(f"            {r['url']}")
+    print("sources: " + ", ".join(f"{k} {v}" for k, v in stats.items()))
+    print("dropped: " + ", ".join(f"{k} {v}" for k, v in dropped.items() if v))
+    print(f"new: {len(out)} (wide = geo fits, check = read the posting) · full list: {OUT}")
+    for r in out[:a.top]:
+        age = "?" if r["age_days"] is None else f"{r['age_days']:.0f}d"
+        print(f"{r['geo']} {age} | {r['company'][:24]} | {r['title'][:70]} | {r['location'][:28]} | {r['url']}")
+    if len(out) > a.top:
+        print(f"... {len(out) - a.top} more in {OUT.name}")
 
     if a.to_tracker:
         import tracker
@@ -216,7 +206,7 @@ def main() -> int:
                              "posted_days": r["age_days"] if r["age_days"] is not None else "",
                              "status": "found", "updated_at": today})
         tracker.save(rows)
-        print(f"\nЗаписано в трекер: {len(out)}")
+        print(f"to tracker: {len(out)}")
     return 0
 
 

@@ -1,66 +1,42 @@
-# Источники вакансий
+# Job sources
 
-Главное правило: **верим ATS компании, а не агрегатору.** Агрегаторы вешают «Remote» на вакансии
-одной страны и показывают дату, когда сами нашли вакансию. Агрегатор — чтобы найти; ATS — чтобы
-проверить гео, дату и подать.
+Trust the company ATS, not aggregators: they label one-country jobs "Remote" and show the date
+they found the job. Aggregator = discover; ATS = verify geo/date and apply.
 
-## Словарь
-
-- **ATS** — система найма компании (Greenhouse, Ashby, Lever, Workable, Recruitee…). Её дата и гео
-  настоящие, её форма принимает заявку.
-- **Борд** — страница вакансий одной компании на ATS: `jobs.ashbyhq.com/<slug>`.
-- **Slug** — имя компании в адресе борда.
-- **Агрегатор** — сайт, собирающий чужие вакансии со ссылкой на ATS.
-
-## 1. Что уже подключено в `scripts/scan.py` (без ключей, без браузера)
-
-| Источник | Что даёт | Гео честное? |
+## 1. Built into `jk scan` (no keys, no browser)
+| Source | Gives | Honest geo? |
 |---|---|---|
-| `ats` — борды из `config/ats_orgs.txt` | настоящие формы, дата публикации компании | да, но «Remote» всё равно проверять |
-| `jobicy` | remote, много Европы | да (поле региона) |
-| `remoteok` | remote, много US | частично |
-| `remotive` | remote, широкий | частично |
+| `ats` — boards from me/boards.txt (or config/ats_orgs.txt) | real forms, company dates | yes, still verify "Remote" |
+| `jobicy` | remote, much Europe | yes |
+| `remoteok` | remote, much US | partly |
+| `remotive` | remote, broad | partly |
+Toggle via `search.sources`; tags via `search.board_tags`.
 
-Включить/выключить — `search.sources` в профиле. Теги досок — `search.board_tags`.
+## 2. Company boards — the most productive channel
+`jk boards` fits the seed list to the profile and geo → `me/boards.txt`. Grow it under `# mine`:
+1. Interesting company → careers page → engine + slug from the URL: `jobs.ashbyhq.com/acme` →
+   `ashby acme`; `job-boards.greenhouse.io/acme` → `greenhouse acme`; `jobs.lever.co/acme` →
+   `lever acme`; `apply.workable.com/acme` → `workable acme`; `acme.recruitee.com` → `recruitee acme`.
+2. Verify: `curl -s https://api.ashbyhq.com/posting-api/job-board/<slug> | head -c 200` (non-empty = ok).
+3. Add the line, re-run `jk boards`.
+Where to find companies: VC portfolio job boards (Getro/Consider: Accel, Index, Atomico, Balderton,
+Point Nine, Sequoia…), YC Work at a Startup, competitors of companies in the queue, LinkedIn feed.
 
-## 2. Борды компаний — самый продуктивный канал
-
-Почти все хорошие подачи приходят с бордов компаний: там гео написано честно («Remote — EMEA»),
-и ссылка сразу ведёт на форму. `config/ats_orgs.txt` — стартовый список; его надо вести под себя.
-
-**Как пополнять:**
-1. Видишь интересную компанию (в агрегаторе, ленте, у VC) → открой её страницу Careers.
-2. По адресу формы пойми движок и slug: `jobs.ashbyhq.com/acme` → `ashby acme`;
-   `job-boards.greenhouse.io/acme` → `greenhouse acme`; `jobs.lever.co/acme` → `lever acme`.
-3. Проверь slug curl'ом (команды в шапке `config/ats_orgs.txt`) — непустой ответ = ок.
-4. Допиши строку в раздел «мои».
-
-**Где брать компании:** портфолио венчурных фондов (job-борды фондов на Getro/Consider: Accel,
-Index, Atomico, Balderton, Point Nine, Sequoia…), списки «best places to work», конкуренты компаний,
-куда уже подаёшься, компании из ленты LinkedIn, выпускники акселераторов (YC — `workatastartup.com`).
-
-## 3. Ручные и полуручные каналы
-
-| Канал | Как | Замечание |
+## 3. Manual channels
+| Channel | How | Note |
 |---|---|---|
-| LinkedIn Jobs | в залогиненном Chrome, фильтры: Past week, Remote, уровень | **не скрейпить скриптами** — риск бана. После ~40 просмотров за сессию перестаёт отдавать тексты — JD читать на ATS |
-| Лента LinkedIn | поиск публикаций «hiring product manager» + регион | вакансии, которых нет на досках; только чтение |
-| Telegram-каналы вакансий | по нише и региону | часто контакт рекрутёра вместо формы → `contacts.md` |
-| Himalayas, 4dayweek, Wellfound | через браузер | Himalayas — честные страны |
-| Нишевые доски | по домену (крипто, climate, AI, геймдев) | спросить кандидата, какие знает |
-| Рефералы | знакомые в компаниях | самая высокая конверсия — спросить кандидата про сеть |
-| Локальные сайты | hh.ru, getmatch, Хабр Карьера, djinni, StepStone, Welcome to the Jungle | по рынку кандидата |
+| LinkedIn Jobs | candidate's Chrome, Past week + Remote + level | never scrape; after ~40 views texts stop loading — read JD on the ATS |
+| LinkedIn posts | search posts "hiring product manager" + region | jobs that aren't on boards; read only |
+| Telegram job channels | by niche/region | often a recruiter contact → contacts.md |
+| Himalayas, 4dayweek, Wellfound | browser | Himalayas lists honest countries |
+| Niche boards | by domain (crypto, climate, AI, games) | ask the candidate |
+| Referrals | candidate's network | highest conversion — ask weekly |
+| Local sites | hh.ru, getmatch, Habr Career, Djinni, StepStone, Welcome to the Jungle… | by market |
 
-## 4. Что не работает
+## 4. Don't
+WeWorkRemotely ("Anywhere" on nearly all, de facto US) · Indeed/Glassdoor/ZipRecruiter (block bots) ·
+aggregators hiding the company without login (can't dedup).
 
-- **WeWorkRemotely** — регион «Anywhere» стоит почти на всех вакансиях, по факту US.
-- **Indeed, Glassdoor, ZipRecruiter** — блокируют автоматический доступ.
-- Агрегаторы, которые прячут компанию без логина, — без компании нельзя проверить дубль.
-
-## 5. Если поиск даёт мало
-
-Мало новых — сигнал чинить источник, а не добирать старьё:
-1. Расширить `title_include` (синонимы роли), проверить `title_exclude` — не режет ли лишнее.
-2. Пополнить `config/ats_orgs.txt` новыми компаниями (раздел 2).
-3. Увеличить `max_age_days` до 21 — но свежее всё равно идёт первым.
-4. Подключить локальные сайты рынка кандидата.
+## 5. Few results → fix the source
+Widen `title_include` (synonyms), check `title_exclude` · add companies to boards · `max_age_days` 21
+(fresh still first) · add local sites.

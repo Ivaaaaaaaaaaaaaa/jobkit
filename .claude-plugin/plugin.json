@@ -1,0 +1,8 @@
+{
+  "name": "jobkit",
+  "version": "0.2.0",
+  "description": "Job search agent: onboarding from CV/LinkedIn, positioning, fresh job scan with geo filters, tailored CVs and letters, form filling up to Submit, tracker, interview prep, anonymous usage stats.",
+  "author": { "name": "TODO" },
+  "license": "MIT",
+  "keywords": ["job-search", "cv", "resume", "career", "applications"]
+}

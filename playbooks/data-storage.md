@@ -1,62 +1,36 @@
-# Хранение данных
+# Data storage
 
-## 1. Три слоя
+## Layers
+- **Framework** (shared, updatable): plugin code — skills, commands, playbooks, scripts, templates, config.
+- **Personal** `me/`: profile.yaml, experience-bank.md, positioning.md, application-answers.md, cv/, boards.txt.
+- **Working** `data/`: tracker.csv, applications/<id>/ (jd, brief, cv.yaml, CV, letter, answers,
+  prep), import/, events.jsonl, telemetry.json, support/.
+`me/` and `data/` are gitignored and live in the candidate's folder; plugin updates never touch them.
+Backup = copy both (cloud drive at the user's discretion: they contain phone, address, salary).
 
-```
-  ФРЕЙМВОРК (общий, можно делиться)     ЛИЧНОЕ (только у тебя)          РАБОЧЕЕ (только у тебя)
-  CLAUDE.md, playbooks/, scripts/,      me/                             data/
-  templates/, config/, .claude/         profile.yaml                    tracker.csv
-                                        experience-bank.md              applications/<id>/
-                                        positioning.md                    jd.md  brief.md
-                                        application-answers.md            cv.yaml  CV.docx/pdf
-                                        cv/base.yaml, cv/variant-*.yaml   letter.md answers.md prep.md
-                                                                        seen.json scan_latest.json
-```
+## Rules
+- One fact, one place: numbers about self → bank; form answers → application-answers; settings → profile.
+- Tracker is the truth about vacancies — not notes, not agent memory.
+- Every found role is recorded immediately (`found`), before tailoring.
+- The application folder keeps exactly what was sent; save the JD (postings disappear).
 
-- `me/` и `data/` закрыты `.gitignore`. Обновить фреймворк = заменить всё, кроме этих двух папок.
-- Ключи (если появятся) — в `.env`, тоже в `.gitignore`.
-- Бэкап: скопировать `me/` и `data/` в надёжное место (iCloud/Google Drive — на твоё усмотрение:
-  там телефон, адрес, зарплата). Или зашифрованный архив.
+## Tracker columns
+id, company, role, url, source, location, found_at, posted_days, score, track, status, applied_at,
+next_action, next_date, cv_path, comment, updated_at. Opens in Excel/Numbers/Sheets; don't rename
+headers; don't keep it open while the agent writes.
 
-## 2. Правила данных
+## Other backends (same columns)
+Google Sheets: import the CSV, or connect a Sheets/Drive connector and keep the CSV as local cache
+for dedup. Notion: database with these columns (status = Status type), Notion connector with the
+user's PERSONAL account, `tracker.backend: notion`, `tracker.notion_database: <url>`; dedup by query,
+rows named "Company — Role". Before any connector write — confirm it's the user's own account.
 
-- **Один факт — одно место.** Цифры о себе — только в `experience-bank.md`. Ответы анкет — только в
-  `application-answers.md`. Настройки — только в `profile.yaml`. Не дублировать: копии расходятся.
-- **Трекер — источник правды о вакансиях.** Не локальные заметки, не память агента.
-- **Каждая вакансия — запись сразу**, как найдена (`found`), до тейлоринга. Иначе дубль.
-- **Папка отклика хранит всё, что ушло.** Через месяц рекрутёр позвонит — откроешь `cv.yaml` и
-  `letter.md` и увидишь, что именно отправлял(а).
-- Текст вакансии сохраняй в `jd.md` — вакансии исчезают, а на интервью он нужен.
+## Job-search mailbox
+A separate address keeps replies tidy. Connected to Claude (Gmail connector) the agent can update
+statuses from replies, fetch ATS verification codes/links (only from the company or its ATS domain),
+draft answers. Sending only on explicit request.
 
-## 3. Трекер: колонки
-
-`id, company, role, url, source, location, found_at, posted_days, score, track, status, applied_at,
-next_action, next_date, cv_path, comment, updated_at`
-
-Статусы: `found, ready, applied, screening, interview, test, final, offer, rejected, withdrawn, skipped`.
-
-CSV открывается в Excel / Numbers / Google Sheets. Правя руками — не меняй заголовок и не держи
-файл открытым, пока агент пишет.
-
-## 4. Другой бэкенд (по желанию)
-
-Колонки и статусы те же — меняется только место.
-
-**Google Sheets.** Проще всего: раз в день `File → Import → data/tracker.csv`. Или попросить
-агента подключить коннектор Google Sheets/Drive в Claude и писать туда напрямую, сохранив CSV
-как локальную копию для дедупа.
-
-**Notion.** Создать базу с колонками выше (status — тип Status), подключить коннектор Notion в
-Claude (Settings → Connectors) **своим личным аккаунтом**. В профиле `tracker.backend: notion` и
-`tracker.notion_database: <ссылка на базу>`. Агент тогда: дедуп — запросом к базе; запись — новой
-страницей «Компания — Роль». CSV остаётся локальным кешем, правда — в Notion.
-
-Правило для любого коннектора: перед записью сверить, что это **твой** аккаунт и **твоя** база,
-а не рабочая.
-
-## 5. Почта для заявок
-
-Отдельный ящик под поиск — меньше шума, проще отслеживать ответы. Если подключить его к Claude
-(коннектор Gmail), агент сможет: находить письма-ответы и менять статусы, доставать код или ссылку
-подтверждения от ATS (только с домена компании или её ATS), готовить черновики ответов.
-Отправка писем — только по прямой просьбе (`CLAUDE.md` §2.2).
+## Telemetry (anonymous)
+`data/telemetry.json` holds a random install id. Sent: install pings, a monthly counts snapshot,
+support tickets the user confirms. Never: names, contacts, companies, roles, links, CV/letter text.
+`jk telemetry off` disables; `jk telemetry` shows status and queue.

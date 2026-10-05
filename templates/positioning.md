@@ -1,58 +1,33 @@
-<!--
-POSITIONING — как подавать одни и те же факты под разные вакансии.
-Факты — в experience-bank.md, здесь только рамка: какой тайтл, какое саммари, какие истории
-вперёд, о чём молчать. Собирает /positioning из библиотеки playbooks/positioning-library.md.
-Два регистра:
-  ПРАВДА  — реальность; держим, чтобы не переобещать и не противоречить себе.
-  ПИТЧ    — подача, оптимизированная под конверсию: цифры настоящие, слабые сигналы
-            не выпячиваем сами. Тайтлы, компании и цифры не выдумываем никогда.
--->
+<!-- POSITIONING — framing of bank facts per vacancy type. Built by /jobkit:positioning.
+Truth vs pitch: pitch numbers/titles are real; weak signals aren't volunteered. -->
+# Positioning — TODO name
+Updated: TODO
 
-# Позиционирование — TODO имя
+## 0. Choosing a track
+Read the JD (level, stage, domain, what they reward) → closest track (default A) → its title and
+summary + 3–5 JD keywords → 3–4 stories with its tags → follow its don't-volunteer list.
 
-Обновлено: TODO
+## Track A — TODO (default)
+- For: TODO
+- Title: TODO · fallbacks: TODO
+- One-liner: TODO
+- Summary template: TODO
+- Lead stories: TODO
+- Lean into: TODO
+- Don't volunteer: TODO
+- Keywords: TODO
+- Salary tier: TODO
 
-## 0. Как выбрать трек под вакансию
+## Track B — TODO
+(same fields)
 
-1. Прочитать JD: уровень, стадия компании, домен, что они ценят.
-2. Взять ближайший трек ниже; не подходит ни один — трек по умолчанию (A).
-3. Тайтл — из трека; саммари — по шаблону трека + 3–5 слов из JD.
-4. Истории — 3–4 с тегами трека из experience-bank §6, самая сильная первой.
-5. Правила «не выпячивать» трека — соблюдать.
+## Differentiators (for "why you")
+- TODO (3, each with proof)
 
-## Трек A — TODO (по умолчанию)
-
-- **Для каких вакансий:** TODO
-- **Тайтл в CV:** TODO · запасные: TODO
-- **Одна фраза:** TODO
-- **Шаблон саммари:** TODO
-- **Истории вперёд:** TODO
-- **Опираемся на:** TODO
-- **Не выпячиваем сами:** TODO
-- **Ключевые слова:** TODO
-- **Ступень по деньгам:** TODO (см. application-answers §Деньги)
-
-## Трек B — TODO
-
-(тот же набор полей)
-
-## Трек C — TODO
-
-(тот же набор полей)
-
-## Отличие от других кандидатов (для «why you»)
-
-- TODO 3 пункта, каждый со ссылкой на доказательство
-
-## Что заводит (для «why us / why this role»)
-
+## What motivates (for "why us")
 - TODO
 
-## Гипотезы
-
-<!-- Что проверяем подачами: какой трек конвертит лучше, где выше вилки.
-Правило: одна переменная за раз; меньше ~15 откликов на трек — выводов нет. -->
-
-| # | Гипотеза | Как проверяем | Итог |
+## Hypotheses (one variable at a time; <15 applications per track = no conclusion)
+| # | Hypothesis | How tested | Result |
 |---|---|---|---|
 | H1 | TODO | TODO | — |

@@ -1,52 +1,35 @@
-# Письмо и свободные ответы
+# Letters and free-text answers
 
-## Письмо = кейс под их продукт, а не пересказ CV
+## Letter = a case for their product, not a CV retell
+Brief first (5 min) → `data/applications/<id>/brief.md`: what they sell and to whom; 2–3 pains
+visible in the JD ("scale onboarding", "reduce churn", "manual reporting"); requirements you cover
+best; free-text questions of the form (the letter can answer them too).
 
-Обычное сопроводительное повторяет резюме — его не читают. Письмо должно сразу показать:
-«я понял(а) ваш продукт, вот где у вас боль, вот как я такое уже решал(а), вот что сделаю».
+Template (120–260 words, 4 paragraphs):
+1. Their product and one concrete pain from the brief.
+2. A case with a number from the bank: before → what you did → result.
+3. Transfer: what you'd do in the first 60–90 days and how to measure it.
+4. One line of relevant experience + happy to talk.
+Company named; first line is never "I am excited to apply"; no clichés; candidate's calm voice;
+`jk audit --kind letter --company X`.
 
-### Перед письмом — бриф (5 минут)
-Открыть JD и сайт компании, выписать в `data/applications/<id>/brief.md`:
-- что продают и кому (одна строка);
-- 2–3 боли или задачи, видные в JD («scale onboarding», «reduce churn», «manual reporting»);
-- требования, которые закрываешь сильнее всего;
-- свободные вопросы анкеты — письмо может ответить и на них.
+Short "Why us?" (2–4 sentences): their product/mission → your closest result with a number → what you bring.
 
-### Шаблон (120–260 слов, 4 абзаца)
-1. **Их продукт и одна конкретная точка** из брифа — показывает, что прочитал(а).
-2. **Кейс с цифрой** из банка: что было → что сделал(а) → результат.
-3. **Перенос:** что сделаю у них в первые 60–90 дней и чем это мерить.
-4. **Одна строка** про релевантный опыт + готовность созвониться.
+## Free-text answers
+Always fill, optional "Anything else?" too — free space for a case. First sentence = strongest true
+fact. Gap: once, briefly, mid/end, then what you bring. Numbers only from the bank; missing →
+truthful wording without a number + question in the report.
 
-Правила: компания названа по имени; первая фраза — не «I am excited to apply»; без штампов;
-голос кандидата (спокойно, конкретно); проверка `text_audit.py --kind letter --company X`.
-
-### Короткая версия (поле «Why are you interested?», 2–4 предложения)
-Их продукт/миссия одной фразой → твой самый близкий результат с цифрой → что принесёшь.
-
-## Свободные ответы анкеты
-
-- Заполняем всегда, даже необязательные «Anything else?» — это бесплатное место для кейса.
-- Первая фраза — самый сильный правдивый факт по вопросу.
-- Пробел — честно, коротко, один раз, в середине или в конце, и сразу перевод в то, что приносишь.
-- Цифры только из банка. Нет цифры — правдивая формулировка без числа + вопрос кандидату в отчёт.
-
-### Типовые вопросы — откуда брать ответ
-
-| Вопрос | Источник |
+| Question | Source |
 |---|---|
-| Tell us about yourself | банк §1 + трек из positioning |
-| Why this company / role | бриф + «Что заводит» в positioning |
-| Your biggest achievement | лучшая история STAR из банка §6 |
-| A product you love and why | спросить кандидата один раз, записать в application-answers |
-| How do you prioritize | история «Приоритизация» + метод (RICE, impact/effort) |
-| Experience with X (инструмент/домен) | банк; нет — честно + смежное |
-| Managing people / team size | банк, ровно как было; формальное подчинение vs влияние — различать |
-| How do you use AI | конкретный пример из банка, не «использую ChatGPT» |
-| Salary expectations | application-answers §3 |
-| Notice period / start date | application-answers §1 |
+| About yourself | bank §1 + track |
+| Why this company/role | brief + "what motivates" in positioning |
+| Biggest achievement | best STAR story |
+| Product you love | ask once → application-answers |
+| Prioritization | prioritization story + method |
+| Experience with X | bank; none → honest + adjacent |
+| People management | bank exactly; formal reports vs influence |
+| How you use AI | concrete bank example |
+| Salary / notice | application-answers §3 / §1 |
 
-## Сообщения рекрутёрам
-
-Формат личного сообщения — коротко, 5–7 строк, `playbooks/contacts.md`. Длинное письмо — только
-в поле Cover Letter формы.
+Personal messages to recruiters: short format in contacts.md.
