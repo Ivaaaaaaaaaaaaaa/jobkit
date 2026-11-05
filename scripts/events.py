@@ -20,7 +20,7 @@ from paths import DATA, ME, VERSION  # noqa: E402
 
 LOG = DATA / "events.jsonl"
 COMMANDS = {"setup", "cv-interview", "positioning", "find", "apply", "jobs-run", "cv", "pipeline",
-            "interview-prep", "support", "stats"}
+            "interview-prep", "debrief", "support", "stats"}
 
 
 def log(event: str, **props) -> None:
@@ -59,7 +59,7 @@ def hook() -> int:
         log("command", name=m.group(1).split(":")[-1])
     try:
         import telemetry
-        telemetry.monthly_tick()
+        telemetry.tick()
     except Exception:
         pass
     return 0

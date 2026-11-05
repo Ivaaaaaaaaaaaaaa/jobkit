@@ -7,6 +7,9 @@ Input: $ARGUMENTS. Resumable: skip finished phases (see `data/setup-state.json` 
 Script: playbooks/onboarding.md. Talk in the user's language, one phase at a time, 3–6 questions max,
 AskUserQuestion for choices. Edit me/ files in place (keep template comments).
 
+0. **How it works (first run only).** Show the scheme and "What the agent does / never does" from
+   `${CLAUDE_PLUGIN_ROOT}/GUIDE.md` in the user's language, 10 lines max, then one line: "about 30–60
+   minutes, you can stop any time and continue later". Don't wait for an answer — go on.
 1. **Machine.** `jk setup` → fix FAIL lines (offer commands, run after OK). Explain where data lives.
    Mention once: anonymous usage stats (install ping, monthly counts, no personal data) are on;
    `jk telemetry off` disables. Respect a "no".
@@ -20,4 +23,11 @@ AskUserQuestion for choices. Edit me/ files in place (keep template comments).
    skip_companies, banned_claims. Show what you wrote after each phase.
 5. **Boards.** `jk boards` → show kept/dropped and top companies; ask for companies to add (# mine).
 6. **First scan.** `jk scan --top 10` → show; offer /jobkit:cv-interview (stronger CV), then /jobkit:positioning, then /jobkit:find.
-7. `jk setup --check`; write `data/setup-state.json` {"done": [phases]}.
+7. `jk setup --check`, then `jk setup --phase done`.
+8. **Daily routine.** Show "Каждый день" and "Ситуации" from GUIDE.md (in the user's language) and
+   where the full guide is: `${CLAUDE_PLUGIN_ROOT}/GUIDE.md`. Offer to copy it into the folder
+   (`cp` → `./GUIDE.md`) so it's at hand.
+
+After each phase run `jk setup --phase <machine|browser|import|profile|boards|first_scan>`; a phase
+the user skips → `--skip`; a phase that failed → `--fail <short_code>` (a code like
+`no_chrome_extension`, never personal data). This keeps the resume point and the onboarding funnel.

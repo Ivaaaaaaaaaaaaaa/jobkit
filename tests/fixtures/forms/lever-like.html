@@ -1,0 +1,13 @@
+<!doctype html><html><body>
+<form id="site-search"><input name="q" type="search" placeholder="Search site"></form>
+<form id="application" action="/apply">
+  <div><label for="n">Full name *</label><input id="n" name="name" value="Alex Morgan"></div>
+  <div><label for="e">Email *</label><input id="e" name="email" value=""></div>
+  <ul class="application-question"><li><div class="application-label">Are you authorized to work in the EU? *</div></li>
+    <li><label><input type="radio" name="auth" required value="yes" checked> Yes</label></li>
+    <li><label><input type="radio" name="auth" required value="no"> No</label></li>
+    <li><label><input type="radio" name="auth" required value="unsure"> Unsure</label></li></ul>
+  <div><label for="cv">Resume/CV *</label><div><input id="cv" type="file" name="resume"><span>Accepted: .pdf, .docx</span></div></div>
+  <div><label><input type="checkbox" name="gdpr" required> I agree to the privacy policy *</label></div>
+  <button type="submit">Submit application</button>
+</form></body></html>

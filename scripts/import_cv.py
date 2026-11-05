@@ -33,16 +33,25 @@ def extract(p: Path) -> str:
 
 
 def main() -> int:
-    args = [a for a in sys.argv[1:] if not a.startswith("--")]
-    if not args:
+    import argparse
+    ap = argparse.ArgumentParser(usage="jk import <file> [--as cv|linkedin]")
+    ap.add_argument("file", nargs="?")
+    ap.add_argument("--as", dest="kind", choices=["cv", "linkedin"])
+    a = ap.parse_args()
+    if not a.file:
         print(__doc__)
         return 2
-    kind = "linkedin" if "linkedin" in " ".join(sys.argv).lower() else "cv"
-    src = Path(args[0]).expanduser()
+    src = Path(a.file).expanduser()
+    # No --as: guess from the file NAME only (not the folder): LinkedIn's export is "Profile.pdf".
+    kind = a.kind or ("linkedin" if re.search(r"linkedin|^profile$", src.stem.lower()) else "cv")
     if not src.exists():
         print(f"no file: {src}")
         return 1
-    text = re.sub(r"\n{3,}", "\n\n", extract(src)).strip()
+    try:
+        text = re.sub(r"\n{3,}", "\n\n", extract(src)).strip()
+    except Exception as e:  # noqa: BLE001 — corrupt or locked file: say so, no traceback
+        print(f"can't read {src.name}: {type(e).__name__}. Re-export the file, or send DOCX / paste the text.")
+        return 1
     out = DATA / "import" / f"{kind}-{re.sub(r'[^a-z0-9]+', '-', src.stem.lower()).strip('-')}.txt"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(text, encoding="utf-8")

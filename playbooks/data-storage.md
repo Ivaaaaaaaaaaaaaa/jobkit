@@ -2,15 +2,18 @@
 
 ## Layers
 - **Framework** (shared, updatable): plugin code — skills, commands, playbooks, scripts, templates, config.
-- **Personal** `me/`: profile.yaml, experience-bank.md, positioning.md, application-answers.md, cv/, boards.txt.
+- **Personal** `me/`: profile.yaml, experience-bank.md, positioning.md, application-answers.md, cv/, boards.txt,
+  interview-mistakes.md, interview-answers.md, linkedin.md.
 - **Working** `data/`: tracker.csv, applications/<id>/ (jd, brief, cv.yaml, CV, letter, answers,
-  prep), import/, events.jsonl, telemetry.json, support/.
+  prep), interviews/<date>-<company>-<stage>/ (prep, transcript, debrief), import/, events.jsonl,
+  telemetry.json, support/.
 `me/` and `data/` are gitignored and live in the candidate's folder; plugin updates never touch them.
 Backup = copy both (cloud drive at the user's discretion: they contain phone, address, salary).
 
 ## Rules
 - One fact, one place: numbers about self → bank; form answers → application-answers; settings → profile.
-- Tracker is the truth about vacancies — not notes, not agent memory.
+- Tracker is the truth about vacancies — not notes, not agent memory. "How many did we send
+  today" = `jk t today`.
 - Every found role is recorded immediately (`found`), before tailoring.
 - The application folder keeps exactly what was sent; save the JD (postings disappear).
 
@@ -31,6 +34,9 @@ statuses from replies, fetch ATS verification codes/links (only from the company
 draft answers. Sending only on explicit request.
 
 ## Telemetry (anonymous)
-`data/telemetry.json` holds a random install id. Sent: install pings, a monthly counts snapshot,
-support tickets the user confirms. Never: names, contacts, companies, roles, links, CV/letter text.
+`data/telemetry.json` holds a random install id. Sent: install pings, onboarding phases, one
+daily_active ping per active day (counts), milestones (first scan / application / response /
+interview / offer), crash reports (script, exception type, line — no message), a monthly counts
+snapshot, support tickets the user confirms. Never: names, contacts, companies, roles, links,
+CV/letter text. Full list: scripts/telemetry.py docstring.
 `jk telemetry off` disables; `jk telemetry` shows status and queue.

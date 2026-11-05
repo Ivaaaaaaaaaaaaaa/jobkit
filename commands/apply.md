@@ -9,7 +9,7 @@ Role: $ARGUMENTS. Forms: playbooks/forms.md.
 3. Score (match, evidence, track). Low → say so, ask whether to proceed.
 4. CV: overlay by track (cv-guide.md) → `jk audit --kind summary` → `jk cv <overlay>` (+`--pdf` if the form wants PDF).
 5. Letter/answers if the form has fields: brief → letter (cover-letter.md) → `jk audit --kind letter --company X`; answers.md, each audited.
-6. By submit_mode: draft_only → give paths, stop. Else: Chrome tools, new tab, fill everything, attach CV, run formcheck.
-7. confirm_each → stop before Submit, report line, "waiting for confirmation". auto_high and eligible → submit.
+6. By submit_mode: draft_only → give paths, stop. Else: Chrome tools, new tab, screenshot, fill everything, attach CV, run formcheck.
+7. confirm_each → stop before Submit, report line, "waiting for confirmation". auto_high and eligible, or auto_all → submit by ref.
    After sending: "thank you" screen, `jk t set <id> applied --next follow-up --date <+7d>`, close tab.
 8. New form question + answer → application-answers §5.

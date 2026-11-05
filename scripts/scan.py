@@ -87,7 +87,7 @@ def src_ats(_p) -> list[dict]:
 
 def src_jobicy(p) -> list[dict]:
     out = []
-    for tag in (p.get("search", {}).get("board_tags") or ["product"]):
+    for tag in ((p.get("search") or {}).get("board_tags") or ["product"]):
         for j in (kit.get_json(f"https://jobicy.com/api/v2/remote-jobs?count=100&tag={tag}") or {}).get("jobs", []):
             out.append({"company": j.get("companyName", ""), "title": j.get("jobTitle", ""),
                         "location": j.get("jobGeo", ""), "url": j.get("url", ""),
@@ -97,7 +97,7 @@ def src_jobicy(p) -> list[dict]:
 
 def src_remoteok(p) -> list[dict]:
     out = []
-    for tag in (p.get("search", {}).get("board_tags") or ["product"]):
+    for tag in ((p.get("search") or {}).get("board_tags") or ["product"]):
         data = kit.get_json(f"https://remoteok.com/api?tag={tag}") or []
         for j in data[1:] if data and isinstance(data, list) else []:
             out.append({"company": (j.get("company") or "").strip(), "title": j.get("position", ""),
@@ -108,7 +108,7 @@ def src_remoteok(p) -> list[dict]:
 
 def src_remotive(p) -> list[dict]:
     out = []
-    for tag in (p.get("search", {}).get("board_tags") or ["product"]):
+    for tag in ((p.get("search") or {}).get("board_tags") or ["product"]):
         data = kit.get_json(f"https://remotive.com/api/remote-jobs?search={tag}&limit=200") or {}
         for j in data.get("jobs", []):
             out.append({"company": (j.get("company_name") or "").strip(), "title": j.get("title", ""),
@@ -133,7 +133,7 @@ def main() -> int:
     gates = kit.Gates(profile)
     if a.days:
         gates.max_age = a.days
-    names = [a.only] if a.only else (profile.get("search", {}).get("sources") or ["ats", "jobicy", "remoteok"])
+    names = [a.only] if a.only else ((profile.get("search") or {}).get("sources") or ["ats", "jobicy", "remoteok"])
 
     raw, stats = [], {}
     for n in names:
@@ -172,20 +172,50 @@ def main() -> int:
             continue
         out.append(r)
 
-    out.sort(key=lambda r: (r["geo"] != "wide", r["age_days"] if r["age_days"] is not None else 99))
     today = date.today().isoformat()
+    new_count = len(out)
+    for r in out:
+        r["scanned"] = today
+    # Carry the earlier queue: roles found before, not yet in the tracker and still fresh. Without
+    # this a second scan (everything already "seen") wiped the list beyond --top.
+    carried = 0
+    if OUT.exists() and not a.all:
+        try:
+            prev = json.loads(OUT.read_text(encoding="utf-8")) or []
+        except ValueError:
+            prev = []
+        have = {r["url"] for r in out}
+        for r in prev:
+            if not isinstance(r, dict) or r.get("url") in have:
+                continue
+            try:
+                shift = (date.today() - date.fromisoformat(r.get("scanned") or today)).days
+            except ValueError:
+                shift = 0
+            if r.get("age_days") is not None:
+                r["age_days"] = round(r["age_days"] + shift, 1)
+            r["scanned"] = today
+            if not gates.fresh(r.get("age_days")) or not gates.title(r.get("title", "")) \
+                    or kit.known(rows_tracker, r.get("company", ""), r.get("title", ""), r["url"]) == "dup":
+                continue
+            out.append(r)
+            have.add(r["url"])
+            carried += 1
+    out.sort(key=lambda r: (r.get("geo") != "wide", r["age_days"] if r.get("age_days") is not None else 99))
+    out = out[:300]
     for r in uniq.values():
         seen.setdefault(r["url"], today)
     kit.DATA.mkdir(exist_ok=True)
     SEEN.write_text(json.dumps(seen, ensure_ascii=False))
     OUT.write_text(json.dumps(out, ensure_ascii=False, indent=1))
     from events import log
-    log("scan", sources=stats, dropped={k: v for k, v in dropped.items() if v}, new=len(out),
-        wide=sum(r["geo"] == "wide" for r in out))
+    log("scan", sources=stats, dropped={k: v for k, v in dropped.items() if v}, new=new_count,
+        queue=len(out), wide=sum(r["geo"] == "wide" for r in out))
 
     print("sources: " + ", ".join(f"{k} {v}" for k, v in stats.items()))
     print("dropped: " + ", ".join(f"{k} {v}" for k, v in dropped.items() if v))
-    print(f"new: {len(out)} (wide = geo fits, check = read the posting) · full list: {OUT}")
+    print(f"new: {new_count} · from earlier scans, not in tracker yet: {carried} · queue: {len(out)} "
+          f"(wide = geo fits, check = read the posting) · full list: {OUT}")
     for r in out[:a.top]:
         age = "?" if r["age_days"] is None else f"{r['age_days']:.0f}d"
         print(f"{r['geo']} {age} | {r['company'][:24]} | {r['title'][:70]} | {r['location'][:28]} | {r['url']}")

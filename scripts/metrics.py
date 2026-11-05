@@ -48,8 +48,11 @@ def rate(num: int, den: int) -> float | None:
 def compute() -> dict:
     rows, ev = tracker.load(), events.read()
     applied = [r for r in rows if r["status"] in REACHED_APPLY and (r.get("applied_at") or r["status"] != "rejected")]
-    responded = [r for r in applied if r["status"] in RESPONDED
-                 or (r["status"] == "rejected" and r.get("applied_at"))]  # a rejection is a response too
+
+    def is_response(r: dict) -> bool:  # a rejection after applying is a response too
+        return r["status"] in RESPONDED or (r["status"] == "rejected" and bool(r.get("applied_at")))
+
+    responded = [r for r in applied if is_response(r)]
     by_status = Counter(r["status"] for r in rows)
 
     def breakdown(key) -> dict:
@@ -57,7 +60,7 @@ def compute() -> dict:
         for r in applied:
             g = groups[key(r) or "none"]
             g[0] += 1
-            g[1] += r["status"] in RESPONDED
+            g[1] += is_response(r)
         return {k: {"applied": a, "responded": b, "rate": rate(b, a)} for k, (a, b) in groups.items() if a >= MIN_N}
 
     first_resp = [e["days_since_applied"] for e in ev if e.get("event") == "status" and e.get("frm") == "applied"
@@ -148,11 +151,11 @@ def report(m: dict) -> None:
         print("Commands: " + ", ".join(f"/{k} {v}" for k, v in u["commands"].items()))
     flags = []
     if h["last_scan"] and (date.today() - date.fromisoformat(h["last_scan"])).days > 3:
-        flags.append(f"last scan {h['last_scan']} — run /find")
+        flags.append(f"last scan {h['last_scan']} — run /jobkit:find")
     if h["found_older_than_14d"]:
         flags.append(f"{h['found_older_than_14d']} leads stuck in found >14d — apply or skip")
     if h["overdue_next_steps"]:
-        flags.append(f"{h['overdue_next_steps']} overdue next steps — /status")
+        flags.append(f"{h['overdue_next_steps']} overdue next steps — /jobkit:pipeline")
     if flags:
         print("Attention: " + "; ".join(flags))
 
@@ -161,6 +164,7 @@ def main() -> int:
     m = compute()
     if "--share" in sys.argv:
         out = DATA / "metrics-share.json"
+        DATA.mkdir(parents=True, exist_ok=True)
         out.write_text(json.dumps(m, ensure_ascii=False, indent=1))
         print(f"Anonymized metrics: {out}\nNo companies, roles, links or texts inside — safe to send.")
     elif "--json" in sys.argv:

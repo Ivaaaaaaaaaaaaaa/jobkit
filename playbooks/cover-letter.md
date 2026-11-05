@@ -32,4 +32,19 @@ truthful wording without a number + question in the report.
 | How you use AI | concrete bank example |
 | Salary / notice | application-answers §3 / §1 |
 
+## Recurring essay questions
+Three questions repeat in many forms (especially AI, ops and automation roles). Build each from the
+bank, 80–180 words, first sentence = their product or your strongest fact, never a gap.
+```
+Why us              their product (one concrete thing) → why it matters for your work → the role
+                    is what you already do (one number)
+Something you built problem done by hand → how you split it → how errors are caught → result with
+                    a number → "code is private, happy to walk through it on a call"
+What to do first    map where time and money go → priority = frequency × time × cost of error,
+                    against effort → one quick win + one structural fix, from their context →
+                    how you'd measure it
+```
+For "what to do first" research their work (site, JD, blog) and name 2–3 concrete candidates.
+Keep the finished answers in `me/application-answers.md` §6: the next form reuses them.
+
 Personal messages to recruiters: short format in contacts.md.

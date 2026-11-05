@@ -45,6 +45,13 @@ def get_json(url: str, **kw):
         return None
 
 
+def _iso(s: str) -> str:
+    """Make an ISO timestamp acceptable to Python 3.9's fromisoformat: Z, +0000, any fraction length."""
+    s = s.strip().replace(" UTC", "").replace("Z", "+00:00")
+    s = re.sub(r"([+-]\d\d)(\d\d)$", r"\1:\2", s)
+    return re.sub(r"\.(\d+)", lambda m: "." + (m.group(1) + "000000")[:6], s, count=1)
+
+
 def age_days(value) -> float | None:
     """Posting age in days; accepts ISO string, seconds or milliseconds."""
     if value in (None, ""):
@@ -54,7 +61,7 @@ def age_days(value) -> float | None:
             v = float(value)
             d = datetime.fromtimestamp(v / 1000 if v > 1e11 else v, timezone.utc)
         else:
-            d = datetime.fromisoformat(str(value).replace("Z", "+00:00").replace(" UTC", ""))
+            d = datetime.fromisoformat(_iso(str(value)))
             if d.tzinfo is None:
                 d = d.replace(tzinfo=timezone.utc)
         return round((datetime.now(timezone.utc) - d).total_seconds() / 86400, 1)
@@ -89,7 +96,7 @@ class Gates:
 
     def geo(self, location: str) -> str:
         """wide = fits; blocked = definitely not; check = open and read."""
-        loc = location or ""
+        loc = re.sub(r"\b([A-Za-z])\.", r"\1", location or "")   # "U.S." -> "US", "U.K." -> "UK"
         oks = {m.group(0).lower() for m in self.geo_ok.finditer(loc)} if self.geo_ok else set()
         bad = bool(self.geo_bad and self.geo_bad.search(loc))
         # "Remote" is weak: "Remote - US" and "New York (Remote)" are the US. A blocked region

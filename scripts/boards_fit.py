@@ -28,7 +28,10 @@ def own_lines() -> list[str]:
     if not OUT.exists():
         return []
     text = OUT.read_text(encoding="utf-8")
-    return [l for l in text.split(MINE, 1)[1].splitlines() if l.strip()] if MINE in text else []
+    if MINE not in text:
+        return []
+    # Drop the rest of the marker line itself ("# mine — add your own companies below…").
+    return [l for l in text.split(MINE, 1)[1].splitlines()[1:] if l.strip()]
 
 
 def main() -> int:

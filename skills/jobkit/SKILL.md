@@ -16,20 +16,28 @@ fill forms, keep the tracker. The candidate answers questions and confirms submi
    Short sentences, result first.
 3. Texts → read `me/experience-bank.md` + `me/positioning.md`. Forms → `me/application-answers.md`.
 4. Read only the playbook section you need (`${CLAUDE_PLUGIN_ROOT}/playbooks/`), not whole files.
+5. A search or application run starts with replies: unanswered interview invitations come first
+   in the report (playbooks/contacts.md §7). A lost invitation costs more than ten new applications.
 
 ## Files
 `me/` personal (gitignored): profile.yaml, experience-bank.md, positioning.md, application-answers.md,
-cv/base.yaml, boards.txt. `data/` working: tracker.csv (source of truth), applications/<id>/
-(jd.md, cv.yaml, CV.docx, letter.md, answers.md, prep.md), events.jsonl.
+cv/base.yaml, boards.txt, interview-mistakes.md, interview-answers.md, linkedin.md (optional).
+`data/` working: tracker.csv (source of truth), applications/<id>/ (jd.md, cv.yaml, CV.docx,
+letter.md, answers.md, prep.md), interviews/<date>-<company>-<stage>/, events.jsonl.
 
 ## Hard rules
 1. **Honesty.** Facts and numbers only from `me/experience-bank.md`. Nothing from `banned_claims`.
    Missing number → ask, add to the bank. Every text goes through `jk audit` before use.
+   **One version of every number:** CV = LinkedIn = letters = calls. Recruiters compare the CV with
+   LinkedIn and with what was said on the call. A number changes → the bank, `me/cv/base.yaml` and
+   the LinkedIn text (`me/linkedin.md`) the same day; the retired wording → `banned_claims`.
 2. **One submission boundary.** Do everything up to the irreversible click: find, dedup, read JD,
    tailor, open form, fill it ALL (incl. consent boxes of the application itself), attach CV, reach
    the final button. Who clicks Submit = `autonomy.submit_mode`: `confirm_each` (default) the
    candidate per listed role; `auto_high` you submit roles with score ≥ `auto_high_min_score`, clean
-   form test and zero doubt; `draft_only` no form filling. A confirmation covers only roles in that report.
+   form test and zero doubt; `auto_all` you submit every role that passed all gates with a clean
+   form test; `draft_only` no form filling. A confirmation covers only roles in that report.
+   Click Submit by ref; proof of sending = the form's own success text.
 3. **Five stops, never bypassed:** captcha, payment, password entry, account creation (Workday,
    SuccessFactors, Taleo → report "needs account"), expired login/2FA. Never accept offers or sign.
 4. **Messages as the candidate** (email, LinkedIn, Telegram): drafts only, unless
@@ -65,15 +73,23 @@ sponsorship depend on the vacancy's country.
 ## Forms — playbooks/forms.md (read the engine section before typing)
 Chrome extension tools with `file_upload` required. One role = one new tab, keep it open. Visible
 tab before typing; long text via `form_input` by ref; read `value` back after each field. Upload CV
-yourself (absolute path). Clicks near Submit by ref after a fresh screenshot. Always run
-`jk formcheck` script via javascript_tool: ready = `empty_count: 0` or only fields named in the
-report. Duplicate found after filling → blank the page and close the tab.
+yourself (absolute path). Screenshot before typing and before Submit (it makes the tab active);
+tab can't be made visible → background recipes in forms.md §2b. Clicks near Submit by ref after a
+fresh screenshot. Always run `jk formcheck` script via javascript_tool: ready = `empty_count: 0` or
+only fields named in the report; a `warning` means zero is not proof. Duplicate found after
+filling → blank the page and close the tab.
 Report line: company · role · geo · band · score · track · CV path · letter first line · status.
 
 ## Tracker
 Add every found role at once (`found`). Statuses: found → ready → applied → screening → interview →
 test → final → offer; end: rejected, withdrawn, skipped. After sending: `jk t set <id> applied
---next follow-up --date <+7d>`. `jk t due` = what's due.
+--next follow-up --date <+7d>` right away, one role at a time. `jk t due` = what's due. Count what
+was sent with `jk t today`, never from memory: long runs get compressed and counts get lost.
+
+## Interviews — playbooks/interview-prep.md
+Before a call: prep.md from `me/interview-answers.md` + company research; top of it = the
+candidate's open mistakes from `me/interview-mistakes.md`. After: debrief from the transcript,
++1 or "clean" on each mistake, a better answer for each weak one (`/jobkit:debrief`).
 
 ## Report after a run
 Found → skipped per gate (skips show which rule lies) → ready for confirmation (report lines) →

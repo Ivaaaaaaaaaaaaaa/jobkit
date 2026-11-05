@@ -56,3 +56,17 @@ Current salary: required → same as the ask; optional → skip. Don't write "gr
 ## 5. Added during applications
 | Date | Question | Answer |
 |---|---|---|
+
+## 6. Essays and personal stories
+Finished answers to long questions, reused across forms (audited; numbers from the bank).
+Personal questions ("a time you failed", "what you do outside work", "a product you love", "how you
+use AI day to day") — the candidate's own story, asked once, kept here.
+| Question | Answer (80–180 words) | Used at |
+|---|---|---|
+
+## 7. Email per channel
+| Channel | Email the form gets |
+|---|---|
+| ATS forms | contacts.email |
+| LinkedIn Easy Apply | the LinkedIn account's email (can't be changed in the form) |
+| Aggregator profiles (Djinni, hh.ru…) | the profile's email |

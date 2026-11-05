@@ -238,13 +238,19 @@ def main() -> int:
     base = load_yaml(BASE)
     if args:
         ov_path = Path(args[0])
-        ov = load_yaml(ov_path)
+        if not ov_path.exists():
+            sys.exit(f"no overlay file: {ov_path} — write data/applications/<id>/cv.yaml first (cv-guide.md)")
+        ov = load_yaml(ov_path) or {}
         cv = merge(base, ov)
         name = ov.get("file_name") or f"{base.get('header', {}).get('name', 'CV')} CV"
         out = ov_path.parent / f"{name}.docx"
     else:
         cv = merge(base, {})
         out = DATA / f"{base.get('header', {}).get('name', 'CV')} CV.docx"
+    todo = [k for k, v in (cv.get("header") or {}).items() if "TODO" in str(v)] + \
+        (["title"] if "TODO" in str(cv.get("title", "")) else []) + (["summary"] if "TODO" in str(cv.get("summary", "")) else [])
+    if todo or "TODO" in out.name:
+        print(f"⚠ unfilled template fields: {', '.join(todo) or 'name'} — fill me/cv/base.yaml before sending this CV")
     render(cv, out)
     lines = page_count_hint(cv)
     from events import log

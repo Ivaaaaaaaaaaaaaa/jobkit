@@ -7,10 +7,11 @@
   import <file> [--as linkedin]   CV / LinkedIn PDF -> text in data/import/
   boards [--dry]         fit company boards to profile + geo -> me/boards.txt
   scan [--days N] [--to-tracker] [--top N]   find fresh jobs
-  t <add|check|set|list|funnel|due> ...      tracker (data/tracker.csv)
+  t <add|check|set|list|today|funnel|due> ... tracker (data/tracker.csv)
   cv [overlay.yaml] [--pdf]                  render CV
   audit --text "..." [--kind summary|letter|answer] [--company X]
   formcheck              print the form readiness test (paste into javascript_tool)
+  lijob                  print the LinkedIn job panel reader (paste into javascript_tool)
   stats [--share|--json] usage & outcome metrics
   support draft "..." | support send <file> private|github
   telemetry [on|off|status|flush]
@@ -23,21 +24,25 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-VPY = Path.home() / ".jobkit" / "venv" / "bin" / "python"
+VENV = Path.home() / ".jobkit" / "venv"
+VPY = VENV / "bin" / "python"
 MAP = {"setup": "setup.py", "doctor": "setup.py", "import": "import_cv.py", "boards": "boards_fit.py",
        "scan": "scan.py", "t": "tracker.py", "tracker": "tracker.py", "cv": "render_cv.py",
        "audit": "text_audit.py", "stats": "metrics.py", "support": "support.py",
        "telemetry": "telemetry.py", "test": "selftest.py"}
 
-if VPY.exists() and Path(sys.executable).resolve() != VPY.resolve() and not os.environ.get("JK_NO_VENV"):
+# Inside the venv sys.prefix is the venv. Comparing interpreter paths is not enough: on the stock
+# macOS python the venv's bin/python is a symlink that resolves to the system interpreter.
+if VPY.exists() and Path(sys.prefix).resolve() != VENV.resolve() and not os.environ.get("JK_NO_VENV"):
     os.execv(str(VPY), [str(VPY), __file__, *sys.argv[1:]])
 
 if len(sys.argv) < 2 or sys.argv[1] in ("-h", "--help", "help"):
     print(__doc__)
     sys.exit(0)
 cmd, rest = sys.argv[1], sys.argv[2:]
-if cmd == "formcheck":
-    print((HERE / "form_check.js").read_text())
+JS = {"formcheck": "form_check.js", "lijob": "li_job.js"}
+if cmd in JS:
+    print((HERE / JS[cmd]).read_text())
     sys.exit(0)
 if cmd == "doctor":
     rest = ["--check", *rest]

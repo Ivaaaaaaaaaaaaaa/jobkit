@@ -36,6 +36,8 @@ Run in order and keep a log of each step: command, result, time, problems.
 6. /jobkit:pipeline with the news "Acme rejected" (expect: not found, one clarifying line).
 7. /jobkit:stats and `jk stats --share` — confirm the share file has no company names or URLs.
 8. /jobkit:support "test ticket" — draft only, do not send.
+9. /jobkit:debrief Fitly with ${CLAUDE_PLUGIN_ROOT}/tests/fixtures/persona/answers.md as "notes" —
+   expect debrief.md, me/interview-mistakes.md updated, a follow-up draft (not sent).
 
 Final report, as a table: step · pass/fail · evidence (file path or output line) · problems.
 Then: total tokens used if visible (/cost), the 3 most confusing moments for a real user, and
@@ -43,9 +45,14 @@ Then: total tokens used if visible (/cost), the 3 most confusing moments for a r
 and where it is in the fixture; any number not in the fixture is a FAIL.
 ```
 
-What a pass looks like: all 8 steps pass; CV is one page; every number traces to the fixture;
+What a pass looks like: all 9 steps pass; CV is one page; every number traces to the fixture;
 the share file has only counts; no form submitted, no message sent.
 
+## Form fixtures
+`tests/fixtures/forms/` — static pages with engine traps; expected `jk formcheck` results in its README.
+
 ## Metrics to watch per release (PostHog dashboard)
-installs (first vs re-run) · setup steps failing · weekly active installs (monthly_stats) ·
-median scans/applications per install · response rate · audit failure types · support tickets.
+installs (first vs re-run, Python kind) · onboarding funnel and failing phases · crashes by script ·
+weekly active installs and retention (daily_active) · path install → first application → first
+response → interview → offer · versions in use · support tickets.
+Test runs: set `JK_TELEMETRY_TEST=1` — events carry `is_test` and the dashboard filters them out.

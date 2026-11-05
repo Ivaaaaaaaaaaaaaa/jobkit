@@ -24,13 +24,17 @@ CLICHES = r"\b(i am (so )?(excited|thrilled|passionate)|i'?m (so )?(excited|thri
 EMOJI = re.compile("[\U0001F300-\U0001FAFF☀-➿]")
 PLACEHOLDER = re.compile(r"\[[A-Z][^\]]{1,30}\]|<[a-zа-я_ ]{2,30}>|\bTODO\b|\bXXX\b|\bTBD\b", re.I)
 SECOND_PERSON = re.compile(r"\b(you|your|you're|yours)\b|\b(вы|вас|вам|ваш\w*)\b", re.I)
-NUM = re.compile(r"(?<![\w.])[~≈+\-−]?\$?€?£?\d[\d,.]*\s?(%|k|K|M|x|×)?")
+NUM = re.compile(r"(?<![\w.])[~≈+\-−]?\$?€?£?\d[\d,.]*(?:\s?%|\s?[kKMx×](?![A-Za-z]))?")
+# Not metrics: phone numbers (+351 900 000 000, (020) 7946 0000), "24/7", calendar dates.
+MONTH = r"(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.?"
+NOT_METRIC = re.compile(rf"(?:\+|\(\d)[\d ()\-]{{7,}}\d|\b24/7\b|\b{MONTH}\s\d{{1,2}}(?:st|nd|rd|th)?\b"
+                        rf"|\b\d{{1,2}}(?:st|nd|rd|th)?\s{MONTH}(?![a-z])", re.I)
 
 
 def numbers(text: str) -> set[str]:
     out = set()
-    for m in NUM.finditer(text):
-        n = re.sub(r"[~≈+\-−$€£,\s]", "", m.group(0)).lower().replace("×", "x")
+    for m in NUM.finditer(NOT_METRIC.sub(" ", text)):
+        n = re.sub(r"[~≈+\-−$€£,\s]", "", m.group(0)).lower().replace("×", "x").rstrip(".")
         if n and not re.fullmatch(r"(19|20)\d\d", n) and n not in {"1", "2", "3", "0"}:
             out.add(n)
     return out
@@ -56,7 +60,7 @@ def audit(text: str, kind: str = "answer", company: str = "", bank: str | None =
         if unknown:
             probs.append(f"numbers not in experience-bank: {', '.join(unknown)} — remove, or add the fact to the bank first")
     for b in banned:
-        if re.search(rf"\b{re.escape(b)}\b", text, re.I):
+        if re.search(rf"(?<!\w){re.escape(b)}(?!\w)", text, re.I):
             probs.append(f"banned claim {b!r} (profile.yaml -> banned_claims)")
     if EMOJI.search(text):
         probs.append("emoji")
@@ -82,6 +86,11 @@ def selftest() -> int:
     assert audit("Grew retention 30% and cut cost 40%.", bank=bank, banned=[]) == []
     assert any("numbers" in p for p in audit("Grew revenue 250%.", bank=bank, banned=[]))
     assert any("RAG" in p for p in audit("Built RAG systems.", bank=bank, banned=["RAG"]))
+    assert any("C++" in p for p in audit("Wrote C++ services.", bank=bank, banned=["C++"]))
+    assert any(".NET" in p for p in audit("Led .NET migration.", bank=bank, banned=[".NET"]))
+    assert audit("Support runs 24/7 since March 5. Call +351 900 000 000. In 2024.", bank=bank, banned=[]) == []
+    assert audit("Taught 30 kids.", bank="30 people", banned=[]) == []
+    assert any("numbers" in p for p in audit("Grew to 30k users.", bank="30 people", banned=[]))
     assert any("summary" in p for p in audit("You need a PM who ships.", kind="summary", bank=bank, banned=[]))
     assert any("company" in p for p in audit("word " * 150, kind="letter", company="Acme", bank=bank, banned=[]))
     assert any("placeholder" in p for p in audit("Hello [Company] team", bank=bank, banned=[]))

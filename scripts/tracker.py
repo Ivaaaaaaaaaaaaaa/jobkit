@@ -6,6 +6,7 @@
     jk t check "Company::Role" URL ["Company2::Role2" URL2 ...]   # dedup; exit 1 on duplicate
     jk t set <id|url> <status> ["comment"] [--next "what" --date YYYY-MM-DD]
     jk t list [--status applied] [--company X]
+    jk t today [--date YYYY-MM-DD]      # applications sent that day, from the file (not from memory)
     jk t funnel | due | --selftest
 
 check prints: ⛔ same role at the same company or same link (don't apply) · ⚠ same company,
@@ -49,18 +50,27 @@ def norm_role(s: str) -> str:
     return re.sub(r"[^a-z0-9а-яё]+", " ", s).strip()
 
 
+ID_PARAMS = {"id", "jobid", "job_id", "job", "req", "reqid", "requisitionid", "vacancy", "vacancyid",
+             "position", "positionid", "posting", "postingid", "pid", "oid", "ref"}
+
+
 def norm_url(u: str) -> str:
     """One vacancy under different URL spellings -> one key."""
     if not u:
         return ""
     p = urlparse(u.strip())
     q = parse_qs(p.query)
-    for key in ("gh_jid", "jobId", "job_id", "jk", "currentJobId"):   # job id in the query
+    host = p.netloc.lower().replace("www.", "").replace("job-boards.", "boards.")
+    for key in ("gh_jid", "currentJobId", "jk"):     # globally unique ids: same job on any page
         if key in q:
             return f"{key}={q[key][0]}"
     path = re.sub(r"/(apply|application|applications?/new)/?$", "", p.path.rstrip("/"))
-    host = p.netloc.lower().replace("www.", "").replace("job-boards.", "boards.")
-    return f"{host}{path}".lower()
+    # Ids that are unique only within one site stay with the host, and other id-like params stay
+    # in the key: "?id=1" and "?id=2" are two jobs, not one.
+    ids = sorted((k.lower(), v[0]) for k, v in q.items()
+                 if k.lower() in ID_PARAMS or re.fullmatch(r"(job|vacancy|position|posting|req)_?id", k.lower()))
+    tail = ("?" + "&".join(f"{k}={v}" for k, v in ids)) if ids else ""
+    return f"{host}{path}".lower() + tail
 
 
 def load() -> list[dict]:
@@ -81,8 +91,20 @@ def save(rows: list[dict]) -> None:
     tmp.replace(TRACKER)
 
 
+_CYR = dict(zip("абвгдеёжзийклмнопрстуфхцчшщъыьэюяіїєґ",
+                ["a", "b", "v", "g", "d", "e", "e", "zh", "z", "i", "y", "k", "l", "m", "n", "o", "p", "r", "s",
+                 "t", "u", "f", "h", "ts", "ch", "sh", "sch", "", "y", "", "e", "yu", "ya", "i", "yi", "ye", "g"]))
+
+
 def slug(company: str, role: str) -> str:
-    return re.sub(r"[^a-z0-9]+", "-", f"{company}-{role}".lower()).strip("-")[:60]
+    """Readable ASCII id: accents dropped (Café -> cafe), Cyrillic transliterated, else a short hash."""
+    import hashlib
+    import unicodedata
+    raw = f"{company}-{role}".lower()
+    text = "".join(_CYR.get(ch, ch) for ch in raw)
+    text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode()
+    out = re.sub(r"[^a-z0-9]+", "-", text).strip("-")[:60]
+    return out if re.search(r"[a-z0-9]", out) else f"role-{hashlib.sha1(raw.encode()).hexdigest()[:8]}"
 
 
 def find(rows: list[dict], key: str) -> dict | None:
@@ -188,14 +210,33 @@ def cmd_list(a) -> int:
 def cmd_funnel(_a) -> int:
     rows = load()
     by = {s: sum(r["status"] == s for r in rows) for s in STATUSES}
-    applied = sum(by[s] for s in STATUSES[2:])  # everything that reached applied or later
+    applied = sum(by[s] for s in STATUSES[2:] if s != "skipped")  # reached applied or later
     print(f"leads: {len(rows)}")
     for s in STATUSES:
         if by[s]:
             print(f"  {s:<10} {by[s]}")
-    reached = applied - by["applied"] - by["withdrawn"] - by["skipped"]
+    reached = applied - by["applied"] - by["withdrawn"]
     if applied:
         print(f"applied -> any company response: {reached}/{applied} = {reached / applied:.0%}")
+    return 0
+
+
+def sent_on(rows: list[dict], day: str) -> list[dict]:
+    """Rows whose application went out on `day` (any later status counts: it was sent)."""
+    gone = set(STATUSES[2:8]) | {"rejected", "withdrawn"}
+    return [r for r in rows if r.get("applied_at") == day and r["status"] in gone]
+
+
+def cmd_today(a) -> int:
+    day = a.date or date.today().isoformat()
+    rows = sent_on(load(), day)
+    for r in rows:
+        print(f"{r['company']} — {r['role']}  [{r['source'] or '-'}]  {r['url']}")
+    by = {}
+    for r in rows:
+        k = (r.get("source") or "-").split(":")[0]
+        by[k] = by.get(k, 0) + 1
+    print(f"sent {day}: {len(rows)}" + (" (" + ", ".join(f"{k} {v}" for k, v in sorted(by.items())) + ")" if by else ""))
     return 0
 
 
@@ -220,6 +261,11 @@ def selftest() -> int:
     assert norm_url("https://job-boards.greenhouse.io/acme/jobs/123?utm=x") == \
         norm_url("https://boards.greenhouse.io/acme/jobs/123/")
     assert norm_url("https://acme.com/careers?gh_jid=555") == norm_url("https://x.io/a?gh_jid=555")
+    assert norm_url("https://x.com/j?id=1") != norm_url("https://x.com/j?id=2")
+    assert norm_url("https://a.com/x?jobId=5") != norm_url("https://c.com/y?jobId=5")
+    assert norm_url("https://x.com/j?id=1&utm_source=li") == norm_url("https://x.com/j?utm_source=tg&id=1")
+    assert slug("Яндекс", "Продакт") == "yandeks-prodakt" and slug("Café Ünal", "PM") == "cafe-unal-pm"
+    assert slug("株式会社", "社長").startswith("role-") and slug("Z", "Q") == "z-q"
     assert norm_url("https://jobs.ashbyhq.com/acme/uuid/application") == \
         norm_url("https://jobs.ashbyhq.com/acme/uuid")
     rows = [{"id": "a", "company": "Acme", "role": "Product Manager", "url": "https://x.io/1",
@@ -228,6 +274,11 @@ def selftest() -> int:
     assert check(rows, "Acme", "Growth PM", "")[0] == "company"
     assert check(rows, "Other", "PM", "https://x.io/1/")[0] == "dup"
     assert check(rows, "Other", "PM", "")[0] == "new"
+    day = [{"company": "A", "role": "PM", "status": "applied", "applied_at": "2026-11-05", "source": "ats:ashby"},
+           {"company": "B", "role": "PM", "status": "screening", "applied_at": "2026-11-05", "source": "linkedin"},
+           {"company": "C", "role": "PM", "status": "ready", "applied_at": "", "source": ""},
+           {"company": "D", "role": "PM", "status": "applied", "applied_at": "2026-11-04", "source": ""}]
+    assert [r["company"] for r in sent_on(day, "2026-11-05")] == ["A", "B"]
     print("tracker selftest: ok")
     return 0
 
@@ -259,11 +310,13 @@ def main() -> int:
     s = sub.add_parser("list")
     s.add_argument("--status")
     s.add_argument("--company")
+    s = sub.add_parser("today")
+    s.add_argument("--date")
     sub.add_parser("funnel")
     sub.add_parser("due")
     a = p.parse_args()
     return {"add": cmd_add, "check": cmd_check, "set": cmd_set, "list": cmd_list,
-            "funnel": cmd_funnel, "due": cmd_due}[a.cmd](a)
+            "today": cmd_today, "funnel": cmd_funnel, "due": cmd_due}[a.cmd](a)
 
 
 if __name__ == "__main__":

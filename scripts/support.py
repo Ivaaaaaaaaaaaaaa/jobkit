@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 import platform
+import re
 import subprocess
 import sys
 import urllib.parse
@@ -30,6 +31,8 @@ def diagnostics() -> str:
                          capture_output=True, text=True).stdout.strip()
     import events
     tail = [e.get("event") + (f":{e.get('kind') or e.get('name') or ''}") for e in events.read()[-20:]]
+    chk = chk.replace(str(Path.home()), "~")          # no OS username in a public issue
+    chk = re.sub(r"/(Users|home)/[^/\s]+", r"/\1/~", chk)
     return (f"- kit {VERSION} · {platform.system()} {platform.release()} · Python {platform.python_version()}\n"
             f"- setup check:\n```\n{chk}\n```\n- recent events: {', '.join(tail) or 'none'}")
 

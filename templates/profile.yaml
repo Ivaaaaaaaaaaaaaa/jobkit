@@ -34,10 +34,14 @@ geo:
   office_cities: []
   relocation: "no"              # no | open | yes
   relocation_countries: []
+  region_list_policy: "skip"    # "remote in <region>" that lists countries without yours: skip | apply
+                                #   (apply = answer location questions truthfully, never pick a fake country)
   ok_keywords: ["remote", "europe", "emea", "worldwide", "anywhere"]
   # blocked unless a strong ok-word (not plain "remote") is next to it
   block_keywords: ["us", "usa", "united states", "us only", "canada", "india", "new york",
-                   "san francisco", "seattle", "austin", "toronto", "brazil", "latam", "apac", "singapore"]
+                   "san francisco", "seattle", "austin", "toronto", "brazil", "latam", "apac", "singapore",
+                   "north america", "americas", "latin america", "namer", "mexico", "australia",
+                   "new zealand", "anz", "japan"]
 
 work_authorization:             # answers depend on the vacancy's country — see application-answers §2
   citizenship: "TODO"
@@ -51,11 +55,12 @@ salary:                         # tiers and rules: application-answers §3
   target_year: 0
 
 autonomy:
-  submit_mode: "confirm_each"   # confirm_each (you press Submit) | auto_high | draft_only
+  submit_mode: "confirm_each"   # confirm_each (you press Submit) | auto_high | auto_all | draft_only
   auto_high_min_score: 8
   send_messages: false          # true = agent may send messages you explicitly ask for
 
 skip_companies: []              # never apply here
+skip_employer_countries: []     # employer or recruiter based here → skip, even for remote roles
 banned_claims: []               # skills/words you do NOT have; never written anywhere
 
 tracker:
