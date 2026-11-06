@@ -4,13 +4,13 @@ jobs:
   test:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
-        python: ["3.9", "3.12"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: { python-version: "${{ matrix.python }}" }
+        with: { python-version: "3.12" }
       - run: python3 -m pip install -r requirements.txt
       - run: python3 scripts/jk.py test
       - run: npx -y @anthropic-ai/claude-code plugin validate . --strict && npx -y @anthropic-ai/claude-code plugin validate .claude-plugin/plugin.json --strict
@@ -19,3 +19,17 @@ jobs:
           v=$(cat VERSION)
           grep -q "\"version\": \"$v\"" .claude-plugin/plugin.json
           grep -q "\"version\": \"$v\"" .claude-plugin/marketplace.json
+
+  # What a new user has: the python3 that ships with macOS (3.9), no packages installed.
+  # `jk setup` must build its own venv and every command must run inside it.
+  stock-macos-python:
+    runs-on: macos-latest
+    env:
+      JK_TELEMETRY_OFF: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - run: /usr/bin/python3 --version
+      - name: setup on stock python
+        run: JOBKIT_HOME="$RUNNER_TEMP/js" /usr/bin/python3 scripts/jk.py setup
+      - name: tests through the venv
+        run: /usr/bin/python3 scripts/jk.py test
